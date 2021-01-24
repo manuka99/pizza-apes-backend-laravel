@@ -9,58 +9,28 @@ use Laravel\Fortify\Contracts\FailedTwoFactorLoginResponse;
 use Laravel\Fortify\Contracts\TwoFactorChallengeViewResponse;
 use Laravel\Fortify\Contracts\TwoFactorLoginResponse;
 use Laravel\Fortify\Http\Requests\TwoFactorLoginRequest;
+use Laravel\Fortify\Contracts\TwoFactorAuthenticationProvider;
+
 
 class CustomTwoFactorController extends Controller
 {
-    /**
-     * The guard implementation.
-     *
-     * @var \Illuminate\Contracts\Auth\StatefulGuard
-     */
-    protected $guard;
-
-    /**
-     * Create a new controller instance.
-     *
-     * @param  \Illuminate\Contracts\Auth\StatefulGuard  $guard
-     * @return void
-     */
-    public function __construct(StatefulGuard $guard)
+    public function enable(Request $req)
     {
-        $this->guard = $guard;
-    }
+        $user = $req->user();
+        $code = $req->code;
 
-    /**
-     * Show the two factor authentication challenge view.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Laravel\Fortify\Contracts\TwoFactorChallengeViewResponse
-     */
-    public function create(Request $request): TwoFactorChallengeViewResponse
-    {
-        return app(TwoFactorChallengeViewResponse::class);
-    }
-
-    /**
-     * Attempt to authenticate a new session using the two factor authentication code.
-     *
-     * @param  \Laravel\Fortify\Http\Requests\TwoFactorLoginRequest  $request
-     * @return mixed
-     */
-    public function store(TwoFactorLoginRequest $request)
-    {
-        $user = $request->challengedUser();
-
-        if ($code = $request->validRecoveryCode()) {
-            $user->replaceRecoveryCode($code);
-        } elseif (!$request->hasValidCode()) {
-            return app(FailedTwoFactorLoginResponse::class);
+        if (!$user->two_factor_secret) {
+            return response()->json(['message' => 'Two factor authentication secret was missing or incorrect.'])->setStatusCode('422');
+        } else if ($code && app(TwoFactorAuthenticationProvider::class)->verify(
+            decrypt($user->two_factor_secret),
+            $code
+        )) {
+            $user->forceFill([
+                'is_two_factor_enabled' => true,
+            ])->save();
+            return response()->json(['status' => 'two-factor-authentication-enabled'])->setStatusCode('200');
+        } else {
+            return response()->json(['code' => 'The provided two factor authentication code was invalid'])->setStatusCode('422');
         }
-
-        $this->guard->login($user, $request->remember());
-
-        $request->session()->regenerate();
-
-        return app(TwoFactorLoginResponse::class);
     }
 }

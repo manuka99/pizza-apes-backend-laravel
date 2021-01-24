@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CustomTwoFactorController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
@@ -35,9 +36,7 @@ Route::get('/user', function (Request $request) {
     $object = new stdClass();
     $object->name = $user->name;
     $object->email = $user->email;
-    if ($user->two_factor_secret !== null && $user->two_factor_secret !== '')
-        $object->two_factor_authentication_enabled = true;
-    // $object->two_factor_authentication_enabled = false;
+    $object->two_factor_authentication_enabled = $user->is_two_factor_enabled;
     return ["roles" => $request->user()->roles()->get(), "user" => $object];
 })->middleware('auth:sanctum');
 
@@ -79,6 +78,8 @@ if (Features::enabled(Features::twoFactorAuthentication())) {
 
     Route::post('/user/two-factor-authentication', [TwoFactorAuthenticationController::class, 'store'])
         ->middleware($twoFactorMiddleware);
+
+    Route::post('/user/two-factor-authentication-enable', [CustomTwoFactorController::class, 'enable'])->middleware(['auth:sanctum']);
 
     Route::delete('/user/two-factor-authentication', [TwoFactorAuthenticationController::class, 'destroy'])
         ->middleware($twoFactorMiddleware);

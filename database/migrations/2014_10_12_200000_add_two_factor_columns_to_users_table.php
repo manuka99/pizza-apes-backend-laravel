@@ -15,12 +15,16 @@ class AddTwoFactorColumnsToUsersTable extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->text('two_factor_secret')
-                    ->after('password')
-                    ->nullable();
+                ->after('password')
+                ->nullable();
 
             $table->text('two_factor_recovery_codes')
-                    ->after('two_factor_secret')
-                    ->nullable();
+                ->after('two_factor_secret')
+                ->nullable();
+
+            $table->boolean('is_two_factor_enabled')
+                ->after('two_factor_recovery_codes')
+                ->nullable();
         });
     }
 
