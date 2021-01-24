@@ -19,8 +19,8 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
     public function update($user, array $input)
     {
         Validator::make($input, [
-            'name' => ['required', 'string', 'max:255'],
-
+            'fname' => ['required', 'string', 'min:4', 'max:45'],
+            'lname' => ['required', 'string', 'min:4', 'max:45'],
             'email' => [
                 'required',
                 'string',
@@ -28,15 +28,26 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
                 'max:255',
                 Rule::unique('users')->ignore($user->id),
             ],
+            'address' => ['string', 'min:8', 'max:85'],
+            'city' => ['string', 'min:8', 'max:45'],
+            'state' => ['string', 'min:8', 'max:45'],
+            'zip' => ['string', 'min:6', 'max:25'],
         ])->validateWithBag('updateProfileInformation');
 
-        if ($input['email'] !== $user->email &&
-            $user instanceof MustVerifyEmail) {
+        if (
+            $input['email'] !== $user->email &&
+            $user instanceof MustVerifyEmail
+        ) {
             $this->updateVerifiedUser($user, $input);
         } else {
             $user->forceFill([
-                'name' => $input['name'],
+                'fname' => $input['fname'],
+                'lname' => $input['lname'],
                 'email' => $input['email'],
+                'address' => $input['address'],
+                'state' => $input['state'],
+                'city' => $input['city'],
+                'zip' => $input['zip'],
             ])->save();
         }
     }
@@ -51,9 +62,14 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
     protected function updateVerifiedUser($user, array $input)
     {
         $user->forceFill([
-            'name' => $input['name'],
+            'fname' => $input['fname'],
+            'lname' => $input['lname'],
             'email' => $input['email'],
             'email_verified_at' => null,
+            'address' => $input['address'],
+            'state' => $input['state'],
+            'city' => $input['city'],
+            'zip' => $input['zip'],
         ])->save();
 
         $user->sendEmailVerificationNotification();

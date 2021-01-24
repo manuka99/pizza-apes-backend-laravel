@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CustomTwoFactorController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
@@ -33,16 +34,13 @@ use Laravel\Fortify\Http\Controllers\VerifyEmailController;
 
 Route::get('/user', function (Request $request) {
     $user = $request->user();
-    $object = new stdClass();
-    $object->name = $user->name;
-    $object->email = $user->email;
-    $object->two_factor_authentication_enabled = $user->is_two_factor_enabled;
-    return ["roles" => $request->user()->roles()->get(), "user" => $object];
+    $user->two_factor_secret = null;
+    $user->two_factor_recovery_codes = null;
+    return ["roles" => $request->user()->roles()->get(), "user" => $user];
 })->middleware('auth:sanctum');
 
 // fortify
 $limiter = config('fortify.limiters.login');
-$enableViews = config('fortify.views', true);
 $twoFactorLimiter = config('fortify.limiters.two-factor');
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])
     ->middleware(array_filter([
@@ -54,15 +52,8 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->name('logout');
 
 // Password Confirmation...
-if ($enableViews) {
-    Route::get('/user/confirmed-password-status', [ConfirmedPasswordStatusController::class, 'show'])
-        ->middleware(['auth:sanctum'])
-        ->name('password.confirmation');
-}
-
 Route::post('/user/confirm-password', [ConfirmablePasswordController::class, 'store'])
     ->middleware(['auth:sanctum']);
-
 
 // Two Factor Authentication...
 if (Features::enabled(Features::twoFactorAuthentication())) {
@@ -94,6 +85,15 @@ if (Features::enabled(Features::twoFactorAuthentication())) {
         ->middleware($twoFactorMiddleware);
 }
 
+// Route::prefix('/user')->name('user')->middleware(['auth:sanctum'])->group(function () {
+//     Route::post('/update-profile', [UserController::class, 'update'])->name('update.profile');
+// });
+
+if (Features::enabled(Features::updateProfileInformation())) {
+    Route::put('/user/profile-information', [ProfileInformationController::class, 'update'])
+        ->middleware(['auth'])
+        ->name('user-profile-information.update');
+}
 
 Route::get('/fruits', function () {
     return [
