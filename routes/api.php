@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CustomTwoFactorController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserSessionsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -91,6 +92,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //update profile
     Route::put('/user/profile-information', [ProfileInformationController::class, 'update']);
+
+    // get active user sessions
+    Route::get('/user/active-sessions', [UserSessionsController::class, 'index']);
+    
+    Route::get('/user/active-sessions/{id}', [UserSessionsController::class, 'show']);
+
+    Route::get('/user/revoke-session/{id}', [UserSessionsController::class, 'destroy']);
+
 });
 
 Route::get('/fruits', function () {

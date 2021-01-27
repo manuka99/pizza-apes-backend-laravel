@@ -10,4 +10,5 @@ class SessionData extends Model
     use HasFactory;
 
     protected $table = "sessions";
+    public $timestamps = false;
 }
