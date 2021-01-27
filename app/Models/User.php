@@ -9,9 +9,9 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable, TwoFactorAuthenticatable;
+    use HasFactory, Notifiable, TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -50,11 +50,13 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class, 'role_user');
     }
 
-    public function hasAnyRole($role){
+    public function hasAnyRole($role)
+    {
         return null !== $this->roles()->where('name', $role)->first();
     }
 
-    public function hasAnyRoles(array $roles){
+    public function hasAnyRoles(array $roles)
+    {
         return null !== $this->roles()->whereIn('name', $roles)->first();
     }
 }

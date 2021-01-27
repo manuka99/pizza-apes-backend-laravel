@@ -3,6 +3,7 @@
 use App\Http\Controllers\CustomTwoFactorController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
@@ -48,12 +49,17 @@ Route::post('/login', [AuthenticatedSessionController::class, 'store'])
         $limiter ? 'throttle:' . $limiter : null,
     ]));
 
-Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
-    ->name('logout');
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
+
+// Passwords...
+if (Features::enabled(Features::updatePasswords())) {
+    Route::put('/user/password', [PasswordController::class, 'update'])
+        ->middleware(['auth']);
+}
 
 // Password Confirmation...
 Route::post('/user/confirm-password', [ConfirmablePasswordController::class, 'store'])
-    ->middleware(['auth:sanctum']);
+    ->middleware(['auth']);
 
 // Two Factor Authentication...
 if (Features::enabled(Features::twoFactorAuthentication())) {
@@ -89,10 +95,10 @@ if (Features::enabled(Features::twoFactorAuthentication())) {
 //     Route::post('/update-profile', [UserController::class, 'update'])->name('update.profile');
 // });
 
+//update profile
 if (Features::enabled(Features::updateProfileInformation())) {
     Route::put('/user/profile-information', [ProfileInformationController::class, 'update'])
-        ->middleware(['auth'])
-        ->name('user-profile-information.update');
+        ->middleware(['auth']);
 }
 
 Route::get('/fruits', function () {
