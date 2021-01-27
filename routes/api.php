@@ -69,6 +69,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Password Confirmation...
     Route::post('/user/confirm-password', [ConfirmablePasswordController::class, 'store']);
 
+    //send email verification
+    Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
+    ->middleware(['throttle:6,1'])
+    ->name('verification.send');
+
     // Two Factor Authentication...
     $twoFactorMiddleware = Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword')
         ? ['password.confirm'] : [];
