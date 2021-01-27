@@ -33,45 +33,44 @@ use Laravel\Fortify\Http\Controllers\VerifyEmailController;
 |
 */
 
-Route::get('/user', function (Request $request) {
-    $user = $request->user();
-    $user->two_factor_secret = null;
-    $user->two_factor_recovery_codes = null;
-    return ["roles" => $request->user()->roles()->get(), "user" => $user];
-})->middleware('auth_api');
-
-// fortify
+// login
 $limiter = config('fortify.limiters.login');
-$twoFactorLimiter = config('fortify.limiters.two-factor');
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])
     ->middleware(array_filter([
         'guest_api',
         $limiter ? 'throttle:' . $limiter : null,
     ]));
 
-Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
+// two factor authentication challenge
+$twoFactorLimiter = config('fortify.limiters.two-factor');
+Route::post('/two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'store'])
+    ->middleware(array_filter([
+        'guest_api',
+        $twoFactorLimiter ? 'throttle:' . $twoFactorLimiter : null,
+    ]));
 
-// Passwords...
-if (Features::enabled(Features::updatePasswords())) {
-    Route::put('/user/password', [PasswordController::class, 'update'])
-        ->middleware(['auth_api']);
-}
+Route::middleware(['auth:sanctum'])->group(function () {
 
-// Password Confirmation...
-Route::post('/user/confirm-password', [ConfirmablePasswordController::class, 'store'])
-    ->middleware(['auth_api']);
+    //user details
+    Route::get('/user', function (Request $request) {
+        $user = $request->user();
+        $user->two_factor_secret = null;
+        $user->two_factor_recovery_codes = null;
+        return ["roles" => $request->user()->roles()->get(), "user" => $user];
+    });
 
-// Two Factor Authentication...
-if (Features::enabled(Features::twoFactorAuthentication())) {
-    Route::post('/two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'store'])
-        ->middleware(array_filter([
-            'guest_api',
-            $twoFactorLimiter ? 'throttle:' . $twoFactorLimiter : null,
-        ]));
+    // logout
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
 
+    // Passwords...
+    Route::put('/user/password', [PasswordController::class, 'update']);
+
+    // Password Confirmation...
+    Route::post('/user/confirm-password', [ConfirmablePasswordController::class, 'store']);
+
+    // Two Factor Authentication...
     $twoFactorMiddleware = Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword')
-        ? ['auth_api', 'password.confirm']
-        : ['auth_api'];
+        ? ['password.confirm'] : [];
 
     Route::post('/user/two-factor-authentication', [TwoFactorAuthenticationController::class, 'store'])
         ->middleware($twoFactorMiddleware);
@@ -89,17 +88,10 @@ if (Features::enabled(Features::twoFactorAuthentication())) {
 
     Route::post('/user/two-factor-recovery-codes', [RecoveryCodeController::class, 'store'])
         ->middleware($twoFactorMiddleware);
-}
 
-// Route::prefix('/user')->name('user')->middleware(['auth_api'])->group(function () {
-//     Route::post('/update-profile', [UserController::class, 'update'])->name('update.profile');
-// });
-
-//update profile
-if (Features::enabled(Features::updateProfileInformation())) {
-    Route::put('/user/profile-information', [ProfileInformationController::class, 'update'])
-        ->middleware(['auth_api']);
-}
+    //update profile
+    Route::put('/user/profile-information', [ProfileInformationController::class, 'update']);
+});
 
 Route::get('/fruits', function () {
     return [

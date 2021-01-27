@@ -38,13 +38,12 @@ class EnsureSessionIsValid
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!$request->hasSession() || !$request->user()) {
-            return $next($request);
-        } else if (!SessionData::find($request->session()->getId())->isValid) {
+
+        if ($request->hasSession() && $request->user() && !SessionData::find($request->session()->getId())->isValid) {
             $controller = new AuthenticatedSessionController($this->guard);
             $controller->destroy($request);
-        }
-
-        return $next($request);
+            return back()->setStatusCode(401);
+        } else
+            return $next($request);
     }
 }
