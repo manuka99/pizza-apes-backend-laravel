@@ -38,7 +38,7 @@ Route::get('/user', function (Request $request) {
     $user->two_factor_secret = null;
     $user->two_factor_recovery_codes = null;
     return ["roles" => $request->user()->roles()->get(), "user" => $user];
-})->middleware('auth:sanctum');
+})->middleware('auth_api');
 
 // fortify
 $limiter = config('fortify.limiters.login');
@@ -54,12 +54,12 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);
 // Passwords...
 if (Features::enabled(Features::updatePasswords())) {
     Route::put('/user/password', [PasswordController::class, 'update'])
-        ->middleware(['auth']);
+        ->middleware(['auth_api']);
 }
 
 // Password Confirmation...
 Route::post('/user/confirm-password', [ConfirmablePasswordController::class, 'store'])
-    ->middleware(['auth']);
+    ->middleware(['auth_api']);
 
 // Two Factor Authentication...
 if (Features::enabled(Features::twoFactorAuthentication())) {
@@ -70,13 +70,13 @@ if (Features::enabled(Features::twoFactorAuthentication())) {
         ]));
 
     $twoFactorMiddleware = Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword')
-        ? ['auth:sanctum', 'password.confirm']
-        : ['auth:sanctum'];
+        ? ['auth_api', 'password.confirm']
+        : ['auth_api'];
 
     Route::post('/user/two-factor-authentication', [TwoFactorAuthenticationController::class, 'store'])
         ->middleware($twoFactorMiddleware);
 
-    Route::post('/user/two-factor-authentication-enable', [CustomTwoFactorController::class, 'enable'])->middleware(['auth:sanctum']);
+    Route::post('/user/two-factor-authentication-enable', [CustomTwoFactorController::class, 'enable'])->middleware(['auth_api']);
 
     Route::delete('/user/two-factor-authentication', [TwoFactorAuthenticationController::class, 'destroy'])
         ->middleware($twoFactorMiddleware);
@@ -91,14 +91,14 @@ if (Features::enabled(Features::twoFactorAuthentication())) {
         ->middleware($twoFactorMiddleware);
 }
 
-// Route::prefix('/user')->name('user')->middleware(['auth:sanctum'])->group(function () {
+// Route::prefix('/user')->name('user')->middleware(['auth_api'])->group(function () {
 //     Route::post('/update-profile', [UserController::class, 'update'])->name('update.profile');
 // });
 
 //update profile
 if (Features::enabled(Features::updateProfileInformation())) {
     Route::put('/user/profile-information', [ProfileInformationController::class, 'update'])
-        ->middleware(['auth']);
+        ->middleware(['auth_api']);
 }
 
 Route::get('/fruits', function () {
@@ -109,7 +109,7 @@ Route::get('/fruits', function () {
         ['name' => 'cxswee fgf', 'age' => 46],
         ['name' => 'mhjge vbvs', 'age' => 34],
     ];
-})->middleware(['auth', 'admin']);
+})->middleware(['auth_api', 'admin']);
 
 Route::get('/fruit', function () {
     return [

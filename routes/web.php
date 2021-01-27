@@ -36,16 +36,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get("/test/{id?}", function ($id) {
-    Auth::loginUsingId($id);
-});
-
-Route::get("/out", function () {
-    Auth::logout();
-});
-
-Route::get("/others", function (Request $request) {
-    // Auth::logoutOtherDevices('12345678');
+Route::get("/session-id", function (Request $request) {
     return $request->session()->getId();
 });
 
