@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use GeoIP as GeoIP;
 use App\Models\SessionData;
 use Illuminate\Http\Request;
 
@@ -12,7 +13,7 @@ class UserSessionsController extends Controller
     {
         $sessions = SessionData::where('user_id', $request->user()->id)->get();
         $data = ['sessions' => $sessions, 'current' => $request->session()->getId()];
-        if ($request->isJson() || $request->ajax())
+        if ($request->is('api/*'))
             return $data;
         else {
             return view('user.active-sessions', $data);
@@ -23,9 +24,9 @@ class UserSessionsController extends Controller
     public function show(Request $request, $id)
     {
         $session_data = SessionData::findOrFail($id);
-        $geo_data = geoip($session_data->ip_address);
-        $data = ['session_data' => $session_data, 'geo_data' => $geo_data];
-        if ($request->isJson() || $request->ajax())
+        $geo_data = geoip('113.59.217.14')->toArray();
+        $data = ['session_data' => $session_data, 'geo_data' => $geo_data, 'current' => $request->session()->getId()];
+        if ($request->is('api/*'))
             return $data;
         else {
             return view('user.session-info', $data);
@@ -43,7 +44,7 @@ class UserSessionsController extends Controller
 
         $data = [$changed ? "success" : "error" => $changed ? "Session was revoked successfully" : "Unexpected error: session was not revoked"];
 
-        if ($request->isJson() || $request->ajax())
+        if ($request->is('api/*'))
             return $data;
         else {
             return view('user.session-info', $data);

@@ -40,6 +40,10 @@ Route::get("/session-id", function (Request $request) {
     return $request->session()->getId();
 });
 
+Route::get("/geoip", function (Request $request) {
+return geoip()->getLocation('27.974.399.65')->toArray();
+});
+
 Route::group(['middleware' => config('fortify.middleware', ['web'])], function () {
     $enableViews = config('fortify.views', true);
 
