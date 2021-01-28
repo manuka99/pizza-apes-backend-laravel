@@ -33,6 +33,16 @@ use Laravel\Fortify\Http\Controllers\VerifyEmailController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+//user details for react redux
+Route::get('/redux/user', function (Request $request) {
+    $user = $request->user();
+    if ($user) {
+        $user->two_factor_secret = null;
+        $user->two_factor_recovery_codes = null;
+        return ["roles" => $request->user()->roles()->get(), "user" => $user];
+    }
+    return ["roles" => null, "user" => null];
+});
 
 // login
 $limiter = config('fortify.limiters.login');
@@ -107,7 +117,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     
     Route::get('/user/active-sessions/{id}', [UserSessionsController::class, 'show']);
 
-    Route::get('/user/revoke-session/{id}', [UserSessionsController::class, 'destroy']);
+    Route::post('/user/revoke-session/{id}', [UserSessionsController::class, 'destroy']);
 
 });
 

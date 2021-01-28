@@ -36,13 +36,14 @@ class UserSessionsController extends Controller
     // get all details of a particular session
     public function destroy(Request $request, $id)
     {
-        $session_data = SessionData::findOrFail($id);
+        $session_data = SessionData::where('id', $id)->where('user_id', $request->user()->id)->firstOrFail();
         $session_data->isValid = false;
-        $session_data->save;
+        $session_data->save();
 
         $changed = $session_data->wasChanged('isValid');
 
-        $data = [$changed ? "success" : "error" => $changed ? "Session was revoked successfully" : "Unexpected error: session was not revoked"];
+        $data = [$changed ? "success" : "error" => $changed ? "Device was revoked successfully" : "Unexpected error: 
+        device was not revoked"];
 
         if ($request->is('api/*'))
             return $data;

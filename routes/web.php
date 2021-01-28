@@ -41,7 +41,7 @@ Route::get("/session-id", function (Request $request) {
 });
 
 Route::get("/geoip", function (Request $request) {
-return geoip()->getLocation('27.974.399.65')->toArray();
+return geoip()->getLocation('113.59.217.14')->toArray();
 });
 
 Route::group(['middleware' => config('fortify.middleware', ['web'])], function () {
