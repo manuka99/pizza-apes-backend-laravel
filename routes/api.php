@@ -42,6 +42,10 @@ Route::post('/login', [AuthenticatedSessionController::class, 'store'])
         $limiter ? 'throttle:' . $limiter : null,
     ]));
 
+//forgot password
+Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
+    ->middleware(['guest_api']);
+
 // two factor authentication challenge
 $twoFactorLimiter = config('fortify.limiters.two-factor');
 Route::post('/two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'store'])
