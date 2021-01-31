@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CustomTwoFactorController;
+use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserSessionsController;
 use Illuminate\Http\Request;
@@ -64,6 +65,10 @@ Route::post('/two-factor-challenge', [TwoFactorAuthenticatedSessionController::c
         $twoFactorLimiter ? 'throttle:' . $twoFactorLimiter : null,
     ]));
 
+//google auth
+Route::get('/auth/google/redirect', [SocialAuthController::class, 'googleAuth']);
+Route::get('/auth/google/callback', [SocialAuthController::class, 'googleCallback']);
+
 Route::middleware(['auth:sanctum'])->group(function () {
 
     //user details
@@ -85,8 +90,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //send email verification
     Route::post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
-    ->middleware(['throttle:6,1'])
-    ->name('verification.send');
+        ->middleware(['throttle:6,1'])
+        ->name('verification.send');
 
     // Two Factor Authentication...
     $twoFactorMiddleware = Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword')
@@ -114,11 +119,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // get active user sessions
     Route::get('/user/active-sessions', [UserSessionsController::class, 'index']);
-    
+
     Route::get('/user/active-sessions/{id}', [UserSessionsController::class, 'show']);
 
     Route::post('/user/revoke-session/{id}', [UserSessionsController::class, 'destroy']);
-
 });
 
 Route::get('/fruits', function () {

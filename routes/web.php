@@ -44,6 +44,10 @@ Route::get("/geoip", function (Request $request) {
 return geoip()->getLocation('113.59.217.14')->toArray();
 });
 
+//google auth
+Route::get("/auth/google/redirect", [SocialAuthController::class, 'googleAuth']);
+Route::get('/auth/google/callback', [SocialAuthController::class, 'googleCallback']);
+
 Route::group(['middleware' => config('fortify.middleware', ['web'])], function () {
     $enableViews = config('fortify.views', true);
 
