@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\AuthHandleController;
 use App\Http\Controllers\CustomTwoFactorController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserSessionsController;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -35,15 +37,9 @@ use Laravel\Fortify\Http\Controllers\VerifyEmailController;
 |
 */
 //user details for react redux
-Route::get('/redux/user', function (Request $request) {
-    $user = $request->user();
-    if ($user) {
-        $user->two_factor_secret = null;
-        $user->two_factor_recovery_codes = null;
-        return ["roles" => $request->user()->roles()->get(), "user" => $user];
-    }
-    return ["roles" => null, "user" => null];
-});
+Route::get('/redux/user', [AuthHandleController::class, 'getSesssionUser']);
+
+Route::post('/forget/two-factor-login', [AuthHandleController::class, 'forgetTwoFactorLogin']);
 
 // login
 $limiter = config('fortify.limiters.login');
@@ -64,10 +60,6 @@ Route::post('/two-factor-challenge', [TwoFactorAuthenticatedSessionController::c
         'guest_api',
         $twoFactorLimiter ? 'throttle:' . $twoFactorLimiter : null,
     ]));
-
-//google auth
-Route::get('/auth/google/redirect', [SocialAuthController::class, 'googleAuth']);
-Route::get('/auth/google/callback', [SocialAuthController::class, 'googleCallback']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
 

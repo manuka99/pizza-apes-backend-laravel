@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SocialAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Facades\Auth;
@@ -42,10 +43,10 @@ Route::get("/session-id", function (Request $request) {
 
 Route::get("/geoip", function (Request $request) {
 return geoip()->getLocation('113.59.217.14')->toArray();
-});
+})->middleware('auth');
 
 //google auth
-Route::get("/auth/google/redirect", [SocialAuthController::class, 'googleAuth']);
+Route::get("/auth/google/redirect/{name?}", [SocialAuthController::class, 'googleAuth']);
 Route::get('/auth/google/callback', [SocialAuthController::class, 'googleCallback']);
 
 Route::group(['middleware' => config('fortify.middleware', ['web'])], function () {
