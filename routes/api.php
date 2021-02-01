@@ -41,29 +41,29 @@ Route::get('/redux/user', [AuthHandleController::class, 'getSesssionUser']);
 //get login error
 Route::get('/login-error', [AuthHandleController::class, 'loginErrorInSession']);
 
-
 Route::group(['middleware' => ['guest_api']], function () {
+    // login
+    $limiter = config('fortify.limiters.login');
+    Route::post('/login', [AuthenticatedSessionController::class, 'store'])
+        ->middleware(array_filter([
+            $limiter ? 'throttle:' . $limiter : null,
+        ]));
 
-// login
-$limiter = config('fortify.limiters.login');
-Route::post('/login', [AuthenticatedSessionController::class, 'store'])
-    ->middleware(array_filter([
-        $limiter ? 'throttle:' . $limiter : null,
-    ]));
+    //forgot password
+    Route::post('/forgot-password', [PasswordResetLinkController::class, 'store']);
+});
 
-//forgot password
-Route::post('/forgot-password', [PasswordResetLinkController::class, 'store']);
 
-// two factor authentication challenge
-$twoFactorLimiter = config('fortify.limiters.two-factor');
-Route::post('/two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'store'])
+Route::group(['middleware' => 'guest_2fa_api'], function () {
+    // two factor authentication challenge
+    $twoFactorLimiter = config('fortify.limiters.two-factor');
+    Route::post('/two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'store'])
     ->middleware(array_filter([
         $twoFactorLimiter ? 'throttle:' . $twoFactorLimiter : null,
     ]));
 
-// forget 2fa login id
-Route::post('/forget/two-factor-login', [AuthHandleController::class, 'forgetTwoFactorLogin']);
-
+    // forget 2fa login id
+    Route::post('/forget/two-factor-login', [AuthHandleController::class, 'forgetTwoFactorLogin']);
 });
 
 Route::middleware(['auth:sanctum'])->group(function () {

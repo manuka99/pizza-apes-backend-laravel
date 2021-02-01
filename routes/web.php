@@ -46,9 +46,6 @@ Route::get("/geoip", function (Request $request) {
     return geoip()->getLocation('113.59.217.14')->toArray();
 })->middleware('auth');
 
-// forget 2fa login id
-Route::post('/forget/two-factor-login', [AuthHandleController::class, 'forgetTwoFactorLogin'])->middleware(['guest_2fa']);
-
 //guest auth section
 Route::group(['middleware' => ['guest']], function () {
 
@@ -71,18 +68,6 @@ Route::group(['middleware' => ['guest']], function () {
     Route::get("/auth/facebook/redirect/{name?}", [SocialAuthController::class, 'facebookAuth']);
     Route::get('/auth/facebook/callback', [SocialAuthController::class, 'facebookCallback']);
 
-    // Two Factor Authentication...
-    $twoFactorLimiter = config('fortify.limiters.two-factor');
-
-    Route::get('/two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'create'])
-        ->middleware(['guest_2fa'])
-        ->name('two-factor.login');
-
-    Route::post('/two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'store'])
-        ->middleware(array_filter([
-        'guest_2fa' && $twoFactorLimiter ? 'throttle:' . $twoFactorLimiter : null,
-        ]));
-
     // Password Reset...
     Route::get('/forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
@@ -102,6 +87,22 @@ Route::group(['middleware' => ['guest']], function () {
     Route::post('/register', [RegisteredUserController::class, 'store']);
 });
 
+Route::group(['middleware' => 'guest_2fa'], function () {
+
+    // forget 2fa login id
+    Route::post('/forget/two-factor-login', [AuthHandleController::class, 'forgetTwoFactorLogin']);
+
+    // Two Factor Authentication...
+    $twoFactorLimiter = config('fortify.limiters.two-factor');
+
+    Route::get('/two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'create'])
+        ->name('two-factor.login');
+
+    Route::post('/two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'store'])
+        ->middleware(array_filter([
+            $twoFactorLimiter ? 'throttle:' . $twoFactorLimiter : null,
+        ]));
+});
 
 //auth section
 Route::group(['middleware' => ['auth'],], function () {

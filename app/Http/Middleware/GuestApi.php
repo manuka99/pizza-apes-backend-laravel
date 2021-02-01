@@ -21,10 +21,15 @@ class GuestApi
         $guards = empty($guards) ? [null] : $guards;
 
         foreach ($guards as $guard) {
+            // authenticated
             if (Auth::guard($guard)->check()) {
-                return back()->setStatusCode(200);
+                return back()->setStatusCode(401);
             }
         }
+
+        //redirect if 2fa
+        if ($request->session()->has('login.id'))
+            return back()->setStatusCode(401);
 
         return $next($request);
     }
