@@ -14,7 +14,11 @@
         <p> {{ session('status') }}</p>
     @endif
     {{-- reset password success end --}}
-    
+
+    @if (session('login.error'))
+        <p> {{ session()->pull('login.error') }}</p>
+    @endif
+
     <h1>Login</h1>
     <form action="{{ route('login') }}" method="POST">
         @csrf
@@ -34,6 +38,9 @@
         <input type="checkbox" value="forever" name="remember"> Remember me<br><br>
 
         <button type="submit">Login</button>
+
+        <a href="/auth/google/redirect">Login with google</a>
+        <a href="/auth/facebook/redirect">Login with facebook</a>
     </form>
 </body>
 

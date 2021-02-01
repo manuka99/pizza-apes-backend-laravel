@@ -22,6 +22,11 @@
         <br><br>
         <button type="submit">Validate</button>
     </form>
+
+    <form action="{{ url('/forget/two-factor-login') }}" method="POST">
+        @csrf
+        <button type="submit">Logout</button>
+    </form>
 </body>
 
 </html>

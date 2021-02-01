@@ -38,38 +38,38 @@ use Laravel\Fortify\Http\Controllers\VerifyEmailController;
 */
 //user details for react redux
 Route::get('/redux/user', [AuthHandleController::class, 'getSesssionUser']);
+//get login error
+Route::get('/login-error', [AuthHandleController::class, 'loginErrorInSession']);
 
-Route::post('/forget/two-factor-login', [AuthHandleController::class, 'forgetTwoFactorLogin']);
+
+Route::group(['middleware' => ['guest_api']], function () {
 
 // login
 $limiter = config('fortify.limiters.login');
 Route::post('/login', [AuthenticatedSessionController::class, 'store'])
     ->middleware(array_filter([
-        'guest_api',
         $limiter ? 'throttle:' . $limiter : null,
     ]));
 
 //forgot password
-Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])
-    ->middleware(['guest_api']);
+Route::post('/forgot-password', [PasswordResetLinkController::class, 'store']);
 
 // two factor authentication challenge
 $twoFactorLimiter = config('fortify.limiters.two-factor');
 Route::post('/two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'store'])
     ->middleware(array_filter([
-        'guest_api',
         $twoFactorLimiter ? 'throttle:' . $twoFactorLimiter : null,
     ]));
+
+// forget 2fa login id
+Route::post('/forget/two-factor-login', [AuthHandleController::class, 'forgetTwoFactorLogin']);
+
+});
 
 Route::middleware(['auth:sanctum'])->group(function () {
 
     //user details
-    Route::get('/user', function (Request $request) {
-        $user = $request->user();
-        $user->two_factor_secret = null;
-        $user->two_factor_recovery_codes = null;
-        return ["roles" => $request->user()->roles()->get(), "user" => $user];
-    });
+    Route::get('/user', [AuthHandleController::class, 'getAuthUser']);
 
     // logout
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy']);

@@ -27,6 +27,10 @@ class RedirectIfAuthenticated
             }
         }
 
+        //redirect if 2fa
+        if ($request->path() !== "two-factor-challenge" && $request->session()->has('login.id'))
+            return redirect()->route('two-factor.login');
+
         return $next($request);
     }
 }

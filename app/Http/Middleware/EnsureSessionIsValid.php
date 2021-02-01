@@ -42,6 +42,7 @@ class EnsureSessionIsValid
         if ($request->hasSession() && $request->user() && $session !== null && !$session->isValid) {
             $controller = new AuthenticatedSessionController($this->guard);
             $controller->destroy($request);
+            $request->session()->put('login.error', "This device has been revoked by the user associated with this account.");
             return back()->setStatusCode(401);
         } else
             return $next($request);
