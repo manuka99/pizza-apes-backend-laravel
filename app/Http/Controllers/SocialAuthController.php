@@ -13,9 +13,10 @@ use Config;
 
 class SocialAuthController extends Controller
 {
-    public function googleAuth(Request $request, $name = null)
+    public function googleAuth(Request $request)
     {
-        $request->session()->put('login.request.api', $name);
+        if ($request->is("api/*"))
+            $request->session()->put('login.request.api', "api");
         return Socialite::driver('google')->redirect();
     }
 
@@ -25,9 +26,10 @@ class SocialAuthController extends Controller
         return $this->handleSocialLoginAuth($socialLoginUser, "Google", $request);
     }
 
-    public function facebookAuth(Request $request, $name = null)
+    public function facebookAuth(Request $request)
     {
-        $request->session()->put('login.request.api', $name);
+        if ($request->is("api/*"))
+            $request->session()->put('login.request.api', "api");
         return Socialite::driver('facebook')->redirect();
     }
 
@@ -64,9 +66,9 @@ class SocialAuthController extends Controller
         } else {
             $request->session()->put("login.error", "All User profiles at Pizza Apes must have an email address. There is no email address associated with the logged in " . $provider . " account.");
         }
-        
+
         if ($redirectToApi)
-            return redirect(Config('EnvValues.REACT_API_URL'). "/login");
+            return redirect(Config('EnvValues.REACT_API_URL') . "/login");
         else
             return redirect()->route('login');
     }

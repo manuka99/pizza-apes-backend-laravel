@@ -62,10 +62,10 @@ Route::group(['middleware' => ['guest']], function () {
         ]));
 
     //google auth
-    Route::get("/auth/google/redirect/{name?}", [SocialAuthController::class, 'googleAuth']);
+    Route::get("/auth/google/redirect", [SocialAuthController::class, 'googleAuth']);
     Route::get('/auth/google/callback', [SocialAuthController::class, 'googleCallback']);
     //facebook auth
-    Route::get("/auth/facebook/redirect/{name?}", [SocialAuthController::class, 'facebookAuth']);
+    Route::get("/auth/facebook/redirect", [SocialAuthController::class, 'facebookAuth']);
     Route::get('/auth/facebook/callback', [SocialAuthController::class, 'facebookCallback']);
 
     // Password Reset...

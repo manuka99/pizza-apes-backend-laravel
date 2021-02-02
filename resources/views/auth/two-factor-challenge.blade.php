@@ -16,7 +16,7 @@
 
         <h4>Or enter recovery code</h4>
         <input type="text" name="recovery_code">
-        @error('recovery_code')
+        @error('code')
             <br><br>{{ $message }}
         @enderror
         <br><br>

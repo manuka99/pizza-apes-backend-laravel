@@ -49,6 +49,13 @@ Route::group(['middleware' => ['guest_api']], function () {
             $limiter ? 'throttle:' . $limiter : null,
         ]));
 
+    //google auth
+    Route::get("/auth/google/redirect", [SocialAuthController::class, 'googleAuth']);
+    Route::get('/auth/google/callback', [SocialAuthController::class, 'googleCallback']);
+    //facebook auth
+    Route::get("/auth/facebook/redirect", [SocialAuthController::class, 'facebookAuth']);
+    Route::get('/auth/facebook/callback', [SocialAuthController::class, 'facebookCallback']);
+
     //forgot password
     Route::post('/forgot-password', [PasswordResetLinkController::class, 'store']);
 });
