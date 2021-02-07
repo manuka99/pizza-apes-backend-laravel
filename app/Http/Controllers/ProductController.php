@@ -16,7 +16,6 @@ class ProductController extends Controller
         $product->id = $nextId;
         $product->url_name = $nextId;
         $product->save();
-        $product->categories()->attach(1);
         return $nextId;
     }
 
@@ -29,9 +28,17 @@ class ProductController extends Controller
         );
     }
 
+    public function storeCategories(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
+        $product->categories()->sync($request->all());
+    }
+
     public function product(Request $request, $id)
     {
         $productData = Product::findOrFail($id);
-        return ['productData' => $productData];
+        $productCategories = $productData->categories;
+        $productCategoriesIds = $productCategories->pluck('id');
+        return ['productData' => $productData, 'productCategories' => $productCategories, "productCategoriesIds" => $productCategoriesIds];
     }
 }

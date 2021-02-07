@@ -9,7 +9,7 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::where('root_id', 0)->get();
+        $categories = Category::where('root_id', null)->get();
         foreach ($categories as $category) {
             $category->children = Category::allCategoryChildren($category->id);
         }
