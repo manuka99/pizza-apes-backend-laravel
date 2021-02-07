@@ -5,12 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ExtrasValues extends Model
+class ProductCategories extends Model
 {
     use HasFactory;
-
-    public function extras()
-    {
-        return $this->belongsTo(Extras::class);
-    }
 }

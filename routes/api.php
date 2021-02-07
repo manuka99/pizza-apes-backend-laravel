@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthHandleController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomTwoFactorController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserSessionsController;
@@ -65,9 +67,9 @@ Route::group(['middleware' => 'guest_2fa_api'], function () {
     // two factor authentication challenge
     $twoFactorLimiter = config('fortify.limiters.two-factor');
     Route::post('/two-factor-challenge', [TwoFactorAuthenticatedSessionController::class, 'store'])
-    ->middleware(array_filter([
-        $twoFactorLimiter ? 'throttle:' . $twoFactorLimiter : null,
-    ]));
+        ->middleware(array_filter([
+            $twoFactorLimiter ? 'throttle:' . $twoFactorLimiter : null,
+        ]));
 
     // forget 2fa login id
     Route::post('/forget/two-factor-login', [AuthHandleController::class, 'forgetTwoFactorLogin']);
@@ -123,6 +125,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('/user/revoke-session/{id}', [UserSessionsController::class, 'destroy']);
 });
+
+Route::middleware(['auth:sanctum'])->group(
+    function () {
+        Route::post('/products/create', [ProductController::class, 'create']);
+        Route::get('/products/{id}', [ProductController::class, 'product']);
+        Route::post('/products/{id}', [ProductController::class, 'store']);
+        Route::get('/categories', [CategoryController::class, 'index']);
+        Route::post('/categories/new', [CategoryController::class, 'store']);
+    }
+);
 
 Route::get('/fruits', function () {
     return [

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthHandleController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SocialAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Session\Session;
@@ -45,6 +46,8 @@ Route::get("/session-id", function (Request $request) {
 Route::get("/geoip", function (Request $request) {
     return geoip()->getLocation('113.59.217.14')->toArray();
 })->middleware('auth');
+
+Route::get('/categories', [CategoryController::class, 'index']);
 
 //guest auth section
 Route::group(['middleware' => ['guest']], function () {
