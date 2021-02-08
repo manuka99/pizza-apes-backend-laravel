@@ -23,7 +23,8 @@ class FileController extends Controller
             ];
         } else {
             $imageName = time() . '.' . $request->image->extension();
-            $request->image->move(public_path('images'), $imageName);
+            // $request->image->move(public_path('images'), $imageName);
+            $request->image->storeAs('public/files/1/photos/public', $imageName);
 
             return [
                 'index' => $request->index,
