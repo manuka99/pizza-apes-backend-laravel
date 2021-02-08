@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthHandleController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomTwoFactorController;
+use App\Http\Controllers\FileController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\UserController;
@@ -134,6 +135,7 @@ Route::middleware(['auth:sanctum'])->group(
         Route::post('/products/add-category/{id}', [ProductController::class, 'storeCategories']);
         Route::get('/categories', [CategoryController::class, 'index']);
         Route::post('/categories/new', [CategoryController::class, 'store']);
+        Route::post('/files', [FileController::class, 'store']);
     }
 );
 

@@ -40,5 +40,6 @@ class ProductController extends Controller
         $productCategories = $productData->categories;
         $productCategoriesIds = $productCategories->pluck('id');
         return ['productData' => $productData, 'productCategories' => $productCategories, "productCategoriesIds" => $productCategoriesIds];
+        return back()->setStatusCode(200);
     }
 }
