@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Gallery;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -34,12 +35,18 @@ class ProductController extends Controller
         $product->categories()->sync($request->all());
     }
 
-    public function product(Request $request, $id)
+    public function product($id)
     {
         $productData = Product::findOrFail($id);
         $productCategories = $productData->categories;
         $productCategoriesIds = $productCategories->pluck('id');
-        return ['productData' => $productData, 'productCategories' => $productCategories, "productCategoriesIds" => $productCategoriesIds];
+        $productGalleryImages = Gallery::where('pid', $id)->where('type', 'product')->get();
+        return [
+            'productData' => $productData,
+            'productCategories' => $productCategories,
+            "productCategoriesIds" => $productCategoriesIds,
+            "productGalleryImages" => $productGalleryImages,
+        ];
         return back()->setStatusCode(200);
     }
 }

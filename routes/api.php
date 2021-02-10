@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthHandleController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomTwoFactorController;
 use App\Http\Controllers\FileController;
+use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\UserController;
@@ -136,6 +137,7 @@ Route::middleware(['auth:sanctum'])->group(
         Route::get('/categories', [CategoryController::class, 'index']);
         Route::post('/categories/new', [CategoryController::class, 'store']);
         Route::post('/files', [FileController::class, 'store']);
+        Route::post('/gallery/{id}', [GalleryController::class, 'storeProduct']);
     }
 );
 
