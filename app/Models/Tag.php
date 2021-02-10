@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Gallery extends Model
+class Tag extends Model
 {
     use HasFactory;
-    protected $fillable = ['type', 'pid', 'url', 'name'];
+    protected $fillable = ['name', 'pid'];
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Gallery;
 use App\Models\Product;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -41,11 +42,13 @@ class ProductController extends Controller
         $productCategories = $productData->categories;
         $productCategoriesIds = $productCategories->pluck('id');
         $productGalleryImages = Gallery::where('pid', $id)->where('type', 'product')->get();
+        $productTags = Tag::where('pid', $id)->get();
         return [
             'productData' => $productData,
             'productCategories' => $productCategories,
             "productCategoriesIds" => $productCategoriesIds,
             "productGalleryImages" => $productGalleryImages,
+            "productTags" => $productTags,
         ];
         return back()->setStatusCode(200);
     }
