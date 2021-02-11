@@ -134,6 +134,7 @@ Route::middleware(['auth:sanctum'])->group(
         Route::post('/products/create', [ProductController::class, 'create']);
         Route::get('/products/{id}', [ProductController::class, 'product']);
         Route::post('/products/{id}', [ProductController::class, 'store']);
+        Route::post('/products/general_data/{id}', [ProductController::class, 'storeGeneralData']);
         Route::post('/products/add-category/{id}', [ProductController::class, 'storeCategories']);
         Route::get('/categories', [CategoryController::class, 'index']);
         Route::post('/categories/new', [CategoryController::class, 'store']);

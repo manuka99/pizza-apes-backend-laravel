@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Gallery;
 use App\Models\Product;
+use App\Models\ProductVarient;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,11 +24,18 @@ class ProductController extends Controller
 
     public function store(Request $request, $id)
     {
-        Product::findOrFail($id);
-        Product::updateOrCreate(
+        $product = Product::findOrFail($id);
+        $newProduct = Product::updateOrCreate(
             ['id' => $id],
             $request->except(['id']),
         );
+
+        //if product type change remove all types
+        if ($product->type !== $newProduct->type) {
+            $newProduct->productVarients()->delete();
+        }
+
+        return $newProduct;
     }
 
     public function storeCategories(Request $request, $id)
@@ -51,5 +59,26 @@ class ProductController extends Controller
             "productTags" => $productTags,
         ];
         return back()->setStatusCode(200);
+    }
+
+    // simple product data
+    public function storeGeneralData(Request $request, $id)
+    {
+        $data = [
+            'regular_price' => $request->regular_price,
+            'offer_price' => $request->offer_price,
+            'offer_from' => $request->offer_from,
+            'offer_to' => $request->offer_to
+        ];
+        $product = Product::findOrFail($id);
+        if ($product->type === 'simple') {
+            $productVarients = $product->productVarients;
+            if (count($productVarients) > 0)
+                $productVarients[0]->update($data);
+            else
+                $product->productVarients()->save(new ProductVarient($data));
+        } else {
+            return back()->withErrors(['message' => "Product is not a type of simple."]);
+        }
     }
 }
