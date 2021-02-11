@@ -11,7 +11,7 @@ class UserSessionsController extends Controller
     // get all the sessions details of the user
     public function index(Request $request)
     {
-        $sessions = SessionData::where('user_id', $request->user()->id)->get();
+        $sessions = SessionData::where('user_id', $request->user()->id)->where('isValid', true)->get();
         $data = ['sessions' => $sessions, 'current' => $request->session()->getId()];
         if ($request->is('api/*'))
             return $data;
