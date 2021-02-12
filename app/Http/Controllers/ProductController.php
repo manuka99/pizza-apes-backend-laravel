@@ -61,24 +61,30 @@ class ProductController extends Controller
         return back()->setStatusCode(200);
     }
 
-    // simple product data
-    public function storeGeneralData(Request $request, $id)
+    // simple and bundle product data
+    public function getSimpleAndBundleData($id)
     {
-        $data = [
-            'regular_price' => $request->regular_price,
-            'offer_price' => $request->offer_price,
-            'offer_from' => $request->offer_from,
-            'offer_to' => $request->offer_to
-        ];
         $product = Product::findOrFail($id);
-        if ($product->type === 'simple') {
+        if ($product->type === 'simple' || $product->type === 'bundle') {
+            $productVariant = $product->productVarients()->first();
+            if ($productVariant !== null) {
+                $generalData = $productVariant->only('regular_price', 'offer_price', 'schedule_offer', 'offer_from', 'offer_to');
+                return ['generalData' => $generalData];
+            }
+        } else
+            return back()->withErrors(['message' => "Product type does not match with data."]);
+    }
+
+    public function storeSimpleAndBundleData(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
+        if ($product->type === 'simple' || $product->type === 'bundle') {
             $productVarients = $product->productVarients;
             if (count($productVarients) > 0)
-                $productVarients[0]->update($data);
+                $productVarients[0]->update($request->all());
             else
-                $product->productVarients()->save(new ProductVarient($data));
-        } else {
-            return back()->withErrors(['message' => "Product is not a type of simple."]);
-        }
+                $product->productVarients()->save(new ProductVarient($request->all()));
+        } else
+            return back()->withErrors(['message' => "Product type does not match with data."])->setStatusCode(601);
     }
 }

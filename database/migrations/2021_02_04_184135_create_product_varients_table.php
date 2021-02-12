@@ -20,9 +20,11 @@ class CreateProductVarientsTable extends Migration
             $table->string('image')->nullable();
             $table->double('regular_price')->nullable();
             $table->double('offer_price')->nullable();
+            $table->boolean('schedule_offer')->nullable();
             $table->timestamp('offer_from')->nullable();
             $table->timestamp('offer_to')->nullable();
-            $table->integer('stock')->nullable();
+            $table->boolean('manage_stock')->nullable();
+            $table->integer('stock_qty')->nullable();
             $table->integer('low_stock_threshold')->nullable();
             $table->boolean('back_orders')->nullable();
             $table->integer('order_limit_count')->nullable();
