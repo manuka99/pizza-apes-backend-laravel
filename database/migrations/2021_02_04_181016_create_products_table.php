@@ -27,6 +27,8 @@ class CreateProductsTable extends Migration
             $table->string('image')->nullable();
             $table->text('short_description')->nullable();
             $table->text('description')->nullable();
+            $table->string('label')->nullable();
+            $table->string('symbol')->nullable()->default('meat');
             $table->timestamps();
             $table->unique('url_name');
         });

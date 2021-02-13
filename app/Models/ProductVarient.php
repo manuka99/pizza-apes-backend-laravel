@@ -17,11 +17,14 @@ class ProductVarient extends Model
         'offer_from',
         'offer_to',
         'manage_stock',
-        'stock',
+        'stock_qty',
         'low_stock_threshold',
         'back_orders',
         'order_limit_count',
         'order_limit_days',
+        'length',
+        'width',
+        'height',
         'weight',
         'shipping_class'
     ];

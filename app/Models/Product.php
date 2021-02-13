@@ -22,6 +22,8 @@ class Product extends Model
         'is_trashed',
         'default_variation',
         'image',
+        'label',
+        'symbol'
     ];
 
     public function categories()

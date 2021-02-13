@@ -69,7 +69,13 @@ class ProductController extends Controller
             $productVariant = $product->productVarients()->first();
             if ($productVariant !== null) {
                 $generalData = $productVariant->only('regular_price', 'offer_price', 'schedule_offer', 'offer_from', 'offer_to');
-                return ['generalData' => $generalData];
+                $inventory = $productVariant->only('sku_id', 'manage_stock', 'stock_qty', 'low_stock_threshold', 'back_orders', 'order_limit_count', 'order_limit_days');
+                $shipping = $productVariant->only('weight', 'height', 'width', 'length', 'shipping_class');
+                return [
+                    'generalData' => $generalData,
+                    'inventory' => $inventory,
+                    'shipping' => $shipping,
+                ];
             }
         } else
             return back()->withErrors(['message' => "Product type does not match with data."]);
