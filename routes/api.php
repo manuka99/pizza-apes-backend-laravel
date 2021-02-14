@@ -144,6 +144,12 @@ Route::middleware(['auth:sanctum'])->group(
         Route::post('/tags/add/{id}', [TagController::class, 'store']);
         Route::post('/tags/destroy/{id}', [TagController::class, 'destroy']);
         Route::post('/tags/destroy-all/{pid}', [TagController::class, 'destroyAllProductTags']);
+        Route::get('/products/suggested/{id}', [ProductController::class, 'getSuggestedProducts']);
+        Route::post('/products/suggested/{id}', [ProductController::class, 'storeSuggestedProducts']);
+        Route::post('/products/suggested/destroy/{id}', [ProductController::class, 'destroySuggestedProducts']);
+        Route::post('/products/suggested/destroy-all/{id}', [ProductController::class, 'destroyAllSuggestedProducts']);
+
+        Route::post('/search_products', [ProductController::class, 'searchProducts']);
     }
 );
 

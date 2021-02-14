@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthHandleController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\SocialAuthController;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Facades\Artisan;
@@ -42,12 +43,12 @@ Route::get('/', function () {
 
 //Clear all:
 Route::get('/clear', function () {
-    // Artisan::call('cache:clear');
+    Artisan::call('cache:clear');
     // Artisan::call('optimize');
     // Artisan::call('route:cache');
-    // Artisan::call('route:clear');
-    // Artisan::call('view:clear');
-    // Artisan::call('config:cache');
+    Artisan::call('route:clear');
+    Artisan::call('view:clear');
+    Artisan::call('config:cache');
     return "Cleared";
 });
 
@@ -100,7 +101,9 @@ Route::get("/geoip", function (Request $request) {
     return geoip()->getLocation('113.59.217.14')->toArray();
 })->middleware('auth');
 
-Route::get('/categories', [CategoryController::class, 'index']);
+Route::get('/search/{name}', function ($name) {
+    return Product::search($name)->get();
+});
 
 //guest auth section
 Route::group(['middleware' => ['guest']], function () {

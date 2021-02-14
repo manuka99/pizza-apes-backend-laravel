@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Gallery;
 use App\Models\Product;
 use App\Models\ProductVarient;
+use App\Models\SuggestedProducts;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ProductController extends Controller
 {
@@ -61,6 +63,45 @@ class ProductController extends Controller
         return back()->setStatusCode(200);
     }
 
+    //suggested products
+    public function getSuggestedProducts($id)
+    {
+        $product = Product::findOrFail($id);
+        return Product::whereIn('id', $product->suggestedProducts()->pluck('pid'))->get();
+    }
+
+    //search
+    public function searchProducts(Request $request)
+    {
+        $products = Product::search($request->name)->get();
+        return $products;
+    }
+
+    public function storeSuggestedProducts(Request $request, $id)
+    {
+        $product = Product::findOrFail($id);
+
+        foreach ($request->options as $option) {
+            SuggestedProducts::create([
+                'pid' => $option['value'],
+                'pid_parent' => $id
+            ]);
+        }
+        $product = Product::findOrFail($id);
+        return Product::whereIn('id', $product->suggestedProducts()->pluck('pid'))->get();
+    }
+
+    public function destroySuggestedProducts(Request $request, $id)
+    {
+        SuggestedProducts::where('pid', $request->pid)->where('pid_parent', $id)->delete();
+    }
+
+    public function destroyAllSuggestedProducts($id)
+    {
+        $product = Product::findOrFail($id);
+        $product->suggestedProducts()->delete();
+    }
+
     // simple and bundle product data
     public function getSimpleAndBundleData($id)
     {
@@ -78,7 +119,7 @@ class ProductController extends Controller
                 ];
             }
         } else
-            return back()->withErrors(['message' => "Product type does not match with data."]);
+            return response()->json(['message' => "Product type does not match with data."], 422);
     }
 
     public function storeSimpleAndBundleData(Request $request, $id)
@@ -91,6 +132,6 @@ class ProductController extends Controller
             else
                 $product->productVarients()->save(new ProductVarient($request->all()));
         } else
-            return back()->withErrors(['message' => "Product type does not match with data."])->setStatusCode(601);
+            return response()->json(['message' => "Product type does not match with data."], 422);
     }
 }
