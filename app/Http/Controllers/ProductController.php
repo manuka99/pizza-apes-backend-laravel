@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Gallery;
+use App\Models\Options;
+use App\Models\OptionValues;
 use App\Models\Product;
 use App\Models\ProductVarient;
 use App\Models\SuggestedProducts;
@@ -24,6 +26,7 @@ class ProductController extends Controller
         return $nextId;
     }
 
+    // basic product data
     public function store(Request $request, $id)
     {
         $product = Product::findOrFail($id);
@@ -31,11 +34,6 @@ class ProductController extends Controller
             ['id' => $id],
             $request->except(['id']),
         );
-
-        //if product type change remove all types
-        if ($product->type !== $newProduct->type) {
-            $newProduct->productVarients()->delete();
-        }
 
         return $newProduct;
     }

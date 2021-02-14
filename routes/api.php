@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomTwoFactorController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\OptionsController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\TagController;
@@ -131,25 +132,47 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 Route::middleware(['auth:sanctum'])->group(
     function () {
+        Route::post('/files', [FileController::class, 'store']);
+
+        //product
         Route::post('/products/create', [ProductController::class, 'create']);
         Route::get('/products/{id}', [ProductController::class, 'product']);
         Route::post('/products/{id}', [ProductController::class, 'store']);
-        Route::get('/products/simple_bundle/{id}', [ProductController::class, 'getSimpleAndBundleData']);
-        Route::post('/products/simple_bundle/{id}', [ProductController::class, 'storeSimpleAndBundleData']);
+
+        //categories
         Route::post('/products/add-category/{id}', [ProductController::class, 'storeCategories']);
         Route::get('/categories', [CategoryController::class, 'index']);
         Route::post('/categories/new', [CategoryController::class, 'store']);
-        Route::post('/files', [FileController::class, 'store']);
+
+        // gallery
         Route::post('/gallery/{id}', [GalleryController::class, 'storeProduct']);
+
+        // tags
         Route::post('/tags/add/{id}', [TagController::class, 'store']);
         Route::post('/tags/destroy/{id}', [TagController::class, 'destroy']);
         Route::post('/tags/destroy-all/{pid}', [TagController::class, 'destroyAllProductTags']);
+
+        // product data
+        Route::get('/products/simple_bundle/{id}', [ProductController::class, 'getSimpleAndBundleData']);
+        Route::post('/products/simple_bundle/{id}', [ProductController::class, 'storeSimpleAndBundleData']);
+
+        //suggestions
         Route::get('/products/suggested/{id}', [ProductController::class, 'getSuggestedProducts']);
         Route::post('/products/suggested/{id}', [ProductController::class, 'storeSuggestedProducts']);
         Route::post('/products/suggested/destroy/{id}', [ProductController::class, 'destroySuggestedProducts']);
         Route::post('/products/suggested/destroy-all/{id}', [ProductController::class, 'destroyAllSuggestedProducts']);
 
+        //search
         Route::post('/search_products', [ProductController::class, 'searchProducts']);
+
+        //options
+        Route::post('/options/option/{pid}', [OptionsController::class, 'storeOption']);
+        Route::post('/options/option/update/{oid}', [OptionsController::class, 'updateOption']);
+        Route::delete('/options/option/destroy/{oid}', [OptionsController::class, 'deleteOption']);
+        Route::post('/options/option_value/{oid}', [OptionsController::class, 'storeOptionValue']);
+        Route::post('/options/option_value/update/{oid}', [OptionsController::class, 'updateOptionValue']);
+        Route::delete('/options/option_value/destroy/{ovid}', [OptionsController::class, 'deleteOptionValue']);
+        Route::get('/options/bundle/{pid}', [OptionsController::class, 'getBundleOptions']);
     }
 );
 

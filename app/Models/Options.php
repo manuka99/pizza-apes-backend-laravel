@@ -8,15 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class Options extends Model
 {
     use HasFactory;
+    protected $fillable = ['name', 'type', 'select_count'];
 
     public function product()
     {
         return $this->belongsTo(Product::class);
     }
 
-    public function OptionValues()
+    public function optionValues()
     {
-        return $this->hasMany(OptionValues::class);
+        return $this->hasMany(OptionValues::class, 'option_id');
     }
-
 }

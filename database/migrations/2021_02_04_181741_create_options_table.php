@@ -17,8 +17,8 @@ class CreateOptionsTable extends Migration
             $table->id();
             $table->bigInteger('product_id')->unsigned();
             $table->text('name');
-            $table->integer('type');
-            $table->integer('select_count');
+            $table->string('type');
+            $table->integer('select_count')->nullable();
             $table->timestamps();
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });
