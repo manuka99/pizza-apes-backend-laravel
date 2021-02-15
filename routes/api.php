@@ -7,6 +7,7 @@ use App\Http\Controllers\FileController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\OptionsController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductVariantExtrasController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\UserController;
@@ -175,7 +176,19 @@ Route::middleware(['auth:sanctum'])->group(
         Route::get('/options/bundle/{pid}', [OptionsController::class, 'getBundleOptions']);
 
         //extras
-
+        Route::get('/extras/index', [ProductVariantExtrasController::class, 'index']);
+        Route::get('/extras/get/{eid}', [ProductVariantExtrasController::class, 'get']);
+        Route::post('/extras/store', [ProductVariantExtrasController::class, 'store']);
+        Route::post('/extras/update/{eid}', [ProductVariantExtrasController::class, 'update']);
+        Route::delete('/extras/destroy/{eid}', [ProductVariantExtrasController::class, 'destroy']);
+        // extras values
+        Route::post('/extras/values/store/{eid}', [ProductVariantExtrasController::class, 'storeExtraValue']);
+        Route::post('/extras/values/update/{eid}', [ProductVariantExtrasController::class, 'updateExtraValue']);
+        Route::delete('/extras/values/destroy/{evid}', [ProductVariantExtrasController::class, 'destroyExtraValue']);
+        //product variant extras
+        Route::post('/extras/variant/store/{pid}', [ProductVariantExtrasController::class, 'storeProductVariantExtra']);
+        Route::get('/extras/variant/update/{pvid}', [ProductVariantExtrasController::class, 'getProductVariantExtra']);
+        Route::delete('/extras/variant/destroy/{pveid}', [ProductVariantExtrasController::class, 'destroyProductVariantExtra']);
     }
 );
 

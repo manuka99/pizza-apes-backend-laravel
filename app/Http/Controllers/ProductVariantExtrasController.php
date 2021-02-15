@@ -14,6 +14,22 @@ class ProductVariantExtrasController extends Controller
 
     //extras
 
+    public function index()
+    {
+        $extras = Extras::all();
+        foreach ($extras as $extra) {
+            $extra->count = $extra->extrasValues()->count;
+        }
+        return $extras;
+    }
+
+    public function get($eid)
+    {
+        $extra = Extras::findOrFail($eid);
+        $extra->values = $extra->extrasValues;
+        return $extra;
+    }
+
     public function store(Request $request)
     {
         Extras::create($request->all());
@@ -29,6 +45,7 @@ class ProductVariantExtrasController extends Controller
     {
         Extras::destroy($eid);
     }
+
 
     //extras values
     public function storeExtraValue(Request $request, $eid)
