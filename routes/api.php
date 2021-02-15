@@ -183,7 +183,7 @@ Route::middleware(['auth:sanctum'])->group(
         Route::delete('/extras/destroy/{eid}', [ProductVariantExtrasController::class, 'destroy']);
         // extras values
         Route::post('/extras/values/store/{eid}', [ProductVariantExtrasController::class, 'storeExtraValue']);
-        Route::post('/extras/values/update/{eid}', [ProductVariantExtrasController::class, 'updateExtraValue']);
+        Route::post('/extras/values/update/{evid}', [ProductVariantExtrasController::class, 'updateExtraValue']);
         Route::delete('/extras/values/destroy/{evid}', [ProductVariantExtrasController::class, 'destroyExtraValue']);
         //product variant extras
         Route::post('/extras/variant/store/{pid}', [ProductVariantExtrasController::class, 'storeProductVariantExtra']);
