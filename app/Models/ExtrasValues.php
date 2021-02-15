@@ -8,6 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class ExtrasValues extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'name',
+        'image',
+        'price',
+        'layer_image',
+    ];
 
     public function extras()
     {

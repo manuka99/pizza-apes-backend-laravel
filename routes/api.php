@@ -173,6 +173,9 @@ Route::middleware(['auth:sanctum'])->group(
         Route::post('/options/option_value/update/{oid}', [OptionsController::class, 'updateOptionValue']);
         Route::delete('/options/option_value/destroy/{ovid}', [OptionsController::class, 'deleteOptionValue']);
         Route::get('/options/bundle/{pid}', [OptionsController::class, 'getBundleOptions']);
+
+        //extras
+
     }
 );
 
