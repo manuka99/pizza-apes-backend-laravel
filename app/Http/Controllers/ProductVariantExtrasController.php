@@ -71,11 +71,13 @@ class ProductVariantExtrasController extends Controller
         if (($product->type === 'simple' || $product->type === 'bundle') && $product->productVarients()->count() < 2) {
             if ($product->productVarients()->count() === 1)
                 $productVariant = $product->productVarients()->first();
+            // create new variant
+            else
+                $productVariant = $product->productVarients()->save($productVariant);
         } else if ($product->type === 'variant' && $request->product_varient_id !== null)
             $productVariant = ProductVarient::findOrFail($request->product_varient_id);
         else
             return response()->json(['message' => "Product type does not match with data."], 422);
-
         $productVariant->extras()->attach([
             $request->extras_id => [
                 'display_name' => $request->display_name,
@@ -84,15 +86,44 @@ class ProductVariantExtrasController extends Controller
         ]);
     }
 
-    public function getProductVariantExtra($pvid)
+    // public function getProductVariantExtra($pvid)
+    // {
+    //     ProductVarient::findOrFail($pvid);
+    //     $extras = ProductVariantExtras::where('product_varient_id', $pvid)->get();
+    //     foreach ($extras as $extra) {
+    //         $extra->data = Extras::find($extra->extras_id);
+    //         $extra->values = ExtrasValues::where('extras_id', $extra->extras_id)->get();
+    //     }
+    //     return $extras;
+    // }
+
+    public function updateProductVariantExtra(Request $request, $pveid)
     {
-        ProductVarient::findOrFail($pvid);
-        $extras = ProductVariantExtras::where('product_varient_id', $pvid)->get();
-        foreach ($extras as $extra) {
-            $extra->data = Extras::find($extra->extras_id);
-            $extra->values = ExtrasValues::where('extras_id', $extra->extras_id)->get();
+        $productVariantExtra = ProductVariantExtras::findOrFail($pveid);
+        $productVariantExtra->update($request->all());
+    }
+
+    public function getProductVariantExtra(Request $request, $pid)
+    {
+        $productVariant = null;
+        if ($request->type !== 'variant') {
+            // assume pid is product id and fetch the first variant
+            $product = Product::findOrFail($pid);
+            $productVariant = $product->productVarients()->first();
+        } else {
+            // assume pid is product variant id
+            $productVariant = ProductVarient::findOrFail($pid);
         }
-        return $extras;
+        if ($productVariant != null) {
+            $productVariantExtras = ProductVariantExtras::where('product_varient_id', $productVariant->id)->get();
+            foreach ($productVariantExtras as $productVariantExtra) {
+                $extra = Extras::find($productVariantExtra->extras_id);
+                $productVariantExtra->extra = $extra;
+                $productVariantExtra->count = $extra->extrasValues()->count();
+                $productVariantExtra->extrasValues = $extra->extrasValues;
+            }
+            return $productVariantExtras;
+        }
     }
 
     public function destroyProductVariantExtra($pveid)

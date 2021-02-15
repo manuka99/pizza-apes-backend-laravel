@@ -15,7 +15,7 @@ class CreateProductVariantExtrasTable extends Migration
     {
         Schema::create('product_variant_extras', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('product_varients_id')->unsigned();
+            $table->bigInteger('product_varient_id')->unsigned();
             $table->bigInteger('extras_id')->unsigned();
             $table->integer('select_count')->nullable();
             $table->string('display_name')->nullable();

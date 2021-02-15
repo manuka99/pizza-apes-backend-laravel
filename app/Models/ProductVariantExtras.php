@@ -7,5 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProductVariantExtras extends Model
 {
+    protected $fillable = ['display_name', 'select_count', 'extras_id'];
     use HasFactory;
 }
