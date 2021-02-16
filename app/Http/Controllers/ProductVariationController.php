@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductVariantValues;
+use App\Models\ProductVarient;
 use Exception;
 use Hamcrest\Type\IsArray;
 use Illuminate\Http\Request;
@@ -10,7 +12,7 @@ use TypeError;
 
 class ProductVariationController extends Controller
 {
-    public function createAllPosibleVariations($pid, $optionsWithValues = null, $variant = null,)
+    public function createAllPosibleVariations($pid)
     {
         if ($pid !== null) {
             $product = Product::findOrFail($pid);
@@ -21,31 +23,105 @@ class ProductVariationController extends Controller
                     if (count($option->optionValues) > 0)
                         array_push($optionsWithValues, $option->optionValues);
                 }
-                $this->generate2($optionsWithValues);
+                // get all posible variants array
+                $allPosibleVariants = $this->generate2($optionsWithValues);
+                // /save to db
+                // delete all previous variations
+                $product->productVarients()->delete();
+                foreach ($allPosibleVariants as $allPosibleVariant) {
+                    $productVariant = $product->productVarients()->create();
+                    foreach ($allPosibleVariant as $variantValue) {
+                        ProductVariantValues::create([
+                            'product_varient_id' => $productVariant->id,
+                            'product_id' => $pid,
+                            'option_values_id' => $variantValue->id
+                        ]);
+                    }
+                }
+                return $allPosibleVariants;
+            }
+        }
+    }
+
+    public function destroyAllVariants($pid)
+    {
+        $product = Product::findOrFail($pid);
+        $product->productVarients()->delete();
+    }
+
+    public function destroyVariant($pvid)
+    {
+        ProductVarient::destroy($pvid);
+    }
+
+    public function createCustomVariation(Request $request, $pid)
+    {
+        $product = Product::findOrFail($pid);
+        $productVariant = $product->productVarients()->create();
+        foreach ($request->option_value_ids as $option_value_id) {
+            ProductVariantValues::create([
+                'product_varient_id' => $productVariant->id,
+                'product_id' => $pid,
+                'option_values_id' => $option_value_id
+            ]);
+        }
+        $productVariant->refresh();
+        $productVariant->productVarientValues = $productVariant->productVarientValues;
+        return $productVariant;
+    }
+
+    public function getProductVariants($pid)
+    {
+        $product = Product::findOrFail($pid);
+        $productVariants = $product->productVarients;
+        foreach ($productVariants as $productVariant)
+            $productVariant->productVarientValues = $productVariant->productVarientValues;
+        return $productVariants;
+    }
+
+    public function updateProductVariants(Request $request, $pid)
+    {
+        Product::findOrFail($pid);
+        foreach ($request->productVariants as $requestProductVariant) {
+            $productVariant = ProductVarient::find($requestProductVariant->id);
+            // update variant data
+            if ($productVariant !== null) {
+                $productVariant->update($requestProductVariant);
+
+                // update variant values
+                if ($requestProductVariant->productVarientValues !== null) {
+                    $productVariant->productVarientValues()->detach();
+                    foreach ($requestProductVariant->productVarientValues as $newVariantValues) {
+                        ProductVariantValues::create([
+                            'product_varient_id' => $productVariant->id,
+                            'product_id' => $pid,
+                            'option_values_id' => $newVariantValues->id
+                        ]);
+                    }
+                }
             }
         }
     }
 
     public function generate2($optionsWithValues = null, $variant = null, $count = 0)
     {
+        $allPosibleVariants = [];
         if ($optionsWithValues !== null && $count <= (count($optionsWithValues) - 1)) {
-
             foreach ($optionsWithValues[$count] as $option) {
-
                 $newVariant = [];
-
                 if ($variant !== null)
                     $newVariant = $variant;
-
-                array_push($newVariant, $option->value_name);
-
-                if (($count + 1) === count($optionsWithValues)) {
-
-                    echo json_encode($newVariant) . '<br/> <br/>';
-                } else
-                    $this->generate2($optionsWithValues, $newVariant, ($count + 1));
+                array_push($newVariant, $option);
+                if (($count + 1) === count($optionsWithValues))
+                    array_push($allPosibleVariants, $newVariant);
+                else {
+                    $productVariants = $this->generate2($optionsWithValues, $newVariant, ($count + 1));
+                    foreach ($productVariants as $productVariant)
+                        array_push($allPosibleVariants, $productVariant);
+                }
             }
         }
+        return $allPosibleVariants;
     }
 
     public static function generate($optionsWithValues = null)

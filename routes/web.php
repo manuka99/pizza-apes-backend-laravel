@@ -38,6 +38,9 @@ use Laravel\Fortify\Http\Controllers\VerifyEmailController;
 |
 */
 
+Route::get('/variants/{pid}', [ProductVariationController::class, 'createAllPosibleVariations']);
+Route::get('/variants/destroy/{pid}', [ProductVariationController::class, 'destroy']);
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -101,8 +104,6 @@ Route::get("/session-id", function (Request $request) {
 Route::get("/geoip", function (Request $request) {
     return geoip()->getLocation('113.59.217.14')->toArray();
 })->middleware('auth');
-
-Route::get('/variants/{pid}', [ProductVariationController::class, 'createAllPosibleVariations']);
 
 //guest auth section
 Route::group(['middleware' => ['guest']], function () {

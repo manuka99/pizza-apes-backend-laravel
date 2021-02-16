@@ -8,10 +8,12 @@ use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\OptionsController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductVariantExtrasController;
+use App\Http\Controllers\ProductVariationController;
 use App\Http\Controllers\SocialAuthController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserSessionsController;
+use App\Models\ProductVarient;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -193,7 +195,12 @@ Route::middleware(['auth:sanctum'])->group(
         Route::delete('/extras/variant/destroy/{pveid}', [ProductVariantExtrasController::class, 'destroyProductVariantExtra']);
 
         // variable product
-
+        Route::get('/product/variants/{pid}', [ProductVariationController::class, 'getProductVariants']);
+        Route::post('/product/variants/allPosible/{pid}', [ProductVariationController::class, 'createAllPosibleVariations']);
+        Route::post('/product/variants/custom/{pid}', [ProductVariationController::class, 'createCustomVariation']);
+        Route::post('/product/variants/update/{pid}', [ProductVariationController::class, 'updateProductVariants']);
+        Route::delete('/product/variants/destroy-all/{pid}', [ProductVariationController::class, 'destroyAllVariants']);
+        Route::delete('/product/variants/destroy/{pvid}', [ProductVariationController::class, 'destroyVariant']);
     }
 );
 

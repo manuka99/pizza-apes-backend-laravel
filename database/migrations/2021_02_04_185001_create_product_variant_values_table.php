@@ -15,13 +15,14 @@ class CreateProductVariantValuesTable extends Migration
     {
         Schema::create('product_variant_values', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('product_variant_id')->unsigned();
+            $table->bigInteger('product_varient_id')->unsigned();
             $table->bigInteger('product_id')->unsigned();
-            $table->bigInteger('option_value_id')->unsigned();
+            $table->bigInteger('option_values_id')->unsigned();
             $table->timestamps();
-            $table->foreign('product_id')->references('id')->on('product_varients')->onDelete('cascade');
-            $table->foreign('product_variant_id')->references('id')->on('product_varients')->onDelete('cascade');
-            $table->foreign('option_value_id')->references('id')->on('option_values')->onDelete('cascade');
+            $table->unique(['product_varient_id', 'product_id', 'option_values_id'], 'product_variant_option_value');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+            $table->foreign('product_varient_id')->references('id')->on('product_varients')->onDelete('cascade');
+            $table->foreign('option_values_id')->references('id')->on('option_values')->onDelete('cascade');
         });
     }
 
