@@ -171,9 +171,10 @@ Route::middleware(['auth:sanctum'])->group(
         Route::post('/options/option/update/{oid}', [OptionsController::class, 'updateOption']);
         Route::delete('/options/option/destroy/{oid}', [OptionsController::class, 'deleteOption']);
         Route::post('/options/option_value/{oid}', [OptionsController::class, 'storeOptionValue']);
-        Route::post('/options/option_value/update/{oid}', [OptionsController::class, 'updateOptionValue']);
+        Route::post('/options/option_value/update/{ovid}', [OptionsController::class, 'updateOptionValue']);
         Route::delete('/options/option_value/destroy/{ovid}', [OptionsController::class, 'deleteOptionValue']);
-        Route::get('/options/bundle/{pid}', [OptionsController::class, 'getBundleOptions']);
+        Route::delete('/options/option_value/destroy-all/{oid}', [OptionsController::class, 'deleteAllOptionValues']);
+        Route::get('/options/{pid}', [OptionsController::class, 'getProductOptions']);
 
         //extras
         Route::get('/extras/index', [ProductVariantExtrasController::class, 'index']);
@@ -190,6 +191,9 @@ Route::middleware(['auth:sanctum'])->group(
         Route::post('/extras/variant/store/{pid}', [ProductVariantExtrasController::class, 'storeProductVariantExtra']);
         Route::post('/extras/variant/update/{pveid}', [ProductVariantExtrasController::class, 'updateProductVariantExtra']);
         Route::delete('/extras/variant/destroy/{pveid}', [ProductVariantExtrasController::class, 'destroyProductVariantExtra']);
+
+        // variable product
+
     }
 );
 

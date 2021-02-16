@@ -20,7 +20,7 @@ class CreateProductVariantExtrasTable extends Migration
             $table->integer('select_count')->nullable();
             $table->string('display_name')->nullable();
             $table->timestamps();
-            $table->foreign('product_varients_id')->references('id')->on('product_varients')->onDelete('cascade');
+            $table->foreign('product_varient_id')->references('id')->on('product_varients')->onDelete('cascade');
             $table->foreign('extras_id')->references('id')->on('extras')->onDelete('cascade');
         });
     }

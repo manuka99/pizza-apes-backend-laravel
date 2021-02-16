@@ -18,6 +18,7 @@ class CreateOptionValuesTable extends Migration
             $table->bigInteger('option_id')->unsigned();
             $table->bigInteger('value_product_id')->unsigned()->nullable();
             $table->text('value_name')->nullable();
+            $table->text('value_image')->nullable();
             $table->timestamps();
             $table->foreign('option_id')->references('id')->on('options')->onDelete('cascade');
             $table->foreign('value_product_id')->references('id')->on('products')->onDelete('cascade');

@@ -41,11 +41,15 @@ class OptionsController extends Controller
                 $option_value->value_product_id = $productValue['value'];
                 $option->optionValues()->save($option_value);
             }
-        } else if ($option->type === "variant" && $option->value_name !== null) {
-            $option_value = new OptionValues();
-            $option_value->option_id = $request->option_id;
-            $option_value->value_name = $request->value_name;
-            $option_value->save();
+        } else if ($option->type === "variant" && $request->name !== null) {
+            $names = explode(",", $request->name);
+            foreach ($names as $name) {
+                if (strlen(trim($name)) > 0) {
+                    $option_value = new OptionValues();
+                    $option_value->value_name = $name;
+                    $option->optionValues()->save($option_value);
+                }
+            }
         } else
             return response()->json(['message' => "Option values are invalid."], 422);
     }
@@ -53,8 +57,9 @@ class OptionsController extends Controller
     public function updateOptionValue(Request $request, $ovid)
     {
         $optionValue = OptionValues::findOrFail($ovid);
-        if ($request->value_name !== null) {
+        if ($request->value_name !== null && $request->value_name !== "") {
             $optionValue->value_name = $request->value_name;
+            $optionValue->value_image = $request->value_image;
             $optionValue->save();
         } else
             return response()->json(['message' => "Option values are invalid."], 422);
@@ -65,15 +70,23 @@ class OptionsController extends Controller
         OptionValues::destroy($ovid);
     }
 
-    public function getBundleOptions($pid)
+    public function deleteAllOptionValues($oid)
+    {
+        $options = Options::findOrFail($oid);
+        $options->optionValues()->delete();
+    }
+
+    public function getProductOptions($pid)
     {
         $product = Product::findOrFail($pid);
-        if ($product->type === "bundle") {
+        if ($product->type !== "simple") {
             $options = $product->options;
             foreach ($options as $option) {
                 $option->values = $option->optionValues;
-                foreach ($option->values as $value) {
-                    $value->product = Product::find($value->value_product_id);
+                if ($product->type === "bundle") {
+                    foreach ($option->values as $value) {
+                        $value->product = Product::find($value->value_product_id);
+                    }
                 }
             }
             return $options;
