@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthHandleController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductVariationController;
 use App\Http\Controllers\SocialAuthController;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -101,9 +102,7 @@ Route::get("/geoip", function (Request $request) {
     return geoip()->getLocation('113.59.217.14')->toArray();
 })->middleware('auth');
 
-Route::get('/search/{name}', function ($name) {
-    return Product::search($name)->get();
-});
+Route::get('/variants/{pid}', [ProductVariationController::class, 'createAllPosibleVariations']);
 
 //guest auth section
 Route::group(['middleware' => ['guest']], function () {
