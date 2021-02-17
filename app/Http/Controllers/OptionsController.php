@@ -82,9 +82,9 @@ class OptionsController extends Controller
         if ($product->type !== "simple") {
             $options = $product->options;
             foreach ($options as $option) {
-                $option->values = $option->optionValues;
+                $option->optionValues;
                 if ($product->type === "bundle") {
-                    foreach ($option->values as $value) {
+                    foreach ($option->optionValues as $value) {
                         $value->product = Product::find($value->value_product_id);
                     }
                 }

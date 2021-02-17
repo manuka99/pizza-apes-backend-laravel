@@ -13,6 +13,15 @@ use TypeError;
 
 class ProductVariationController extends Controller
 {
+    public function getProductVariants($pid)
+    {
+        $product = Product::findOrFail($pid);
+        $productVariants = $product->productVarients;
+        foreach ($productVariants as $productVariant)
+            $productVariant->productVarientValues;
+        return $productVariants;
+    }
+
     public function createAllPosibleVariations($pid)
     {
         if ($pid !== null) {
@@ -39,7 +48,7 @@ class ProductVariationController extends Controller
                         ]);
                     }
                 }
-                return $allPosibleVariants;
+                return $this->getProductVariants($pid);
             }
         }
     }
@@ -87,9 +96,11 @@ class ProductVariationController extends Controller
             }
             // get other variants
             $otherPosibleVariants =  $this->generateOther($productVariantValues, $optionsWithValues);
+            $newProductVariantIds = [];
             // save to db
             foreach ($otherPosibleVariants as $otherPosibleVariant) {
                 $productVariant = $product->productVarients()->create();
+                array_push($newProductVariantIds, $productVariant->id);
                 foreach ($otherPosibleVariant as $otherPosibleValue) {
                     ProductVariantValues::create([
                         'product_varient_id' => $productVariant->id,
@@ -99,18 +110,15 @@ class ProductVariationController extends Controller
                 }
             }
 
-            return $otherPosibleVariants;
+            // get the new Variants from db
+            $newProductVariants = ProductVarient::whereIn('id', $newProductVariantIds)->get();
+            foreach ($newProductVariants as $newProductVariant) {
+                $newProductVariant->productVarientValues;
+            }
+            return $newProductVariants;
         }
     }
 
-    public function getProductVariants($pid)
-    {
-        $product = Product::findOrFail($pid);
-        $productVariants = $product->productVarients;
-        foreach ($productVariants as $productVariant)
-            $productVariant->productVarientValues;
-        return $productVariants;
-    }
 
     public function updateProductVariants(Request $request, $pid)
     {

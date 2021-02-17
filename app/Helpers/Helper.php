@@ -57,9 +57,13 @@ class Helper
     public static function compare_arrays($array1, $array2)
     {
         if (count($array1) === count($array2)) {
-            foreach ($array1 as $key => $value1) {
-                if ($value1 !== $array2[$key])
-                    return false;
+            foreach ($array1 as $value1) {
+                foreach ($array2 as $key => $value2) {
+                    if ($value1 === $value2)
+                        break;
+                    else if (count($array2) === ($key + 1))
+                        return false;
+                }
             }
             return true;
         }
