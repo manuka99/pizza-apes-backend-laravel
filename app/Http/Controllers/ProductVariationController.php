@@ -62,6 +62,7 @@ class ProductVariationController extends Controller
     public function destroyVariant($pvid)
     {
         ProductVarient::destroy($pvid);
+        return $pvid;
     }
 
     public function createCustomVariation(Request $request, $pid)

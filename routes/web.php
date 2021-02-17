@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthHandleController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\OptionsController;
 use App\Http\Controllers\ProductVariationController;
 use App\Http\Controllers\SocialAuthController;
 use App\Models\Product;
@@ -45,6 +46,7 @@ Route::post('/product/variants/custom/{pid}', [ProductVariationController::class
 Route::post('/product/variants/update/{pid}', [ProductVariationController::class, 'updateProductVariants']);
 Route::post('/product/variants/destroy-all/{pid}', [ProductVariationController::class, 'destroyAllVariants']);
 Route::delete('/product/variants/destroy/{pvid}', [ProductVariationController::class, 'destroyVariant']);
+Route::get('/options/{pid}', [OptionsController::class, 'getProductOptions']);
 
 
 Route::get('/', function () {
