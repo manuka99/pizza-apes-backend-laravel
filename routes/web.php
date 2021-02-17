@@ -38,8 +38,14 @@ use Laravel\Fortify\Http\Controllers\VerifyEmailController;
 |
 */
 
-Route::get('/variants/{pid}', [ProductVariationController::class, 'createAllPosibleVariations']);
-Route::get('/variants/destroy/{pid}', [ProductVariationController::class, 'destroy']);
+Route::get('/product/variants/{pid}', [ProductVariationController::class, 'getProductVariants']);
+Route::post('/product/variants/allPosible/{pid}', [ProductVariationController::class, 'createAllPosibleVariations']);
+Route::get('/product/variants/otherPosible/{pid}', [ProductVariationController::class, 'createOtherVariationsPosible']);
+Route::post('/product/variants/custom/{pid}', [ProductVariationController::class, 'createCustomVariation']);
+Route::post('/product/variants/update/{pid}', [ProductVariationController::class, 'updateProductVariants']);
+Route::post('/product/variants/destroy-all/{pid}', [ProductVariationController::class, 'destroyAllVariants']);
+Route::delete('/product/variants/destroy/{pvid}', [ProductVariationController::class, 'destroyVariant']);
+
 
 Route::get('/', function () {
     return view('welcome');

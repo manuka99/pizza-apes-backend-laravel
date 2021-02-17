@@ -43,4 +43,26 @@ class Helper
             return date('F Y', $ts);
         }
     }
+
+    public static function search_array_in_array($main_array, $search_array)
+    {
+        $result = false;
+        foreach ($main_array as $main_value) {
+            if (is_array($main_array) && self::compare_arrays($main_value, $search_array))
+                $result = true;
+        }
+        return $result;
+    }
+
+    public static function compare_arrays($array1, $array2)
+    {
+        if (count($array1) === count($array2)) {
+            foreach ($array1 as $key => $value1) {
+                if ($value1 !== $array2[$key])
+                    return false;
+            }
+            return true;
+        }
+        return false;
+    }
 }

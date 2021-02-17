@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Helper;
 use App\Models\Product;
 use App\Models\ProductVariantValues;
 use App\Models\ProductVarient;
@@ -70,12 +71,44 @@ class ProductVariationController extends Controller
         return $productVariant;
     }
 
+    public function createOtherVariationsPosible($pid)
+    {
+        $product = Product::findOrFail($pid);
+        $productVariantValues = [];
+        foreach ($product->productVarients as $productVarient) {
+            array_push($productVariantValues, $productVarient->productVarientValues()->pluck('option_values_id'));
+        }
+        if ($product->type === 'variant') {
+            $options = $product->options;
+            $optionsWithValues = [];
+            foreach ($options as $option) {
+                if (count($option->optionValues) > 0)
+                    array_push($optionsWithValues, $option->optionValues);
+            }
+            // get other variants
+            $otherPosibleVariants =  $this->generateOther($productVariantValues, $optionsWithValues);
+            // save to db
+            foreach ($otherPosibleVariants as $otherPosibleVariant) {
+                $productVariant = $product->productVarients()->create();
+                foreach ($otherPosibleVariant as $otherPosibleValue) {
+                    ProductVariantValues::create([
+                        'product_varient_id' => $productVariant->id,
+                        'product_id' => $pid,
+                        'option_values_id' => $otherPosibleValue
+                    ]);
+                }
+            }
+
+            return $otherPosibleVariants;
+        }
+    }
+
     public function getProductVariants($pid)
     {
         $product = Product::findOrFail($pid);
         $productVariants = $product->productVarients;
         foreach ($productVariants as $productVariant)
-            $productVariant->productVarientValues = $productVariant->productVarientValues;
+            $productVariant->productVarientValues;
         return $productVariants;
     }
 
@@ -116,6 +149,27 @@ class ProductVariationController extends Controller
                     array_push($allPosibleVariants, $newVariant);
                 else {
                     $productVariants = $this->generate2($optionsWithValues, $newVariant, ($count + 1));
+                    foreach ($productVariants as $productVariant)
+                        array_push($allPosibleVariants, $productVariant);
+                }
+            }
+        }
+        return $allPosibleVariants;
+    }
+
+    public function generateOther($currentValues = null, $optionsWithValues = null, $variant = null, $count = 0)
+    {
+        $allPosibleVariants = [];
+        if ($optionsWithValues !== null && $count <= (count($optionsWithValues) - 1)) {
+            foreach ($optionsWithValues[$count] as $option) {
+                $newVariant = [];
+                if ($variant !== null)
+                    $newVariant = $variant;
+                array_push($newVariant, $option->id);
+                if (($count + 1) === count($optionsWithValues) && !Helper::search_array_in_array($currentValues, $newVariant))
+                    array_push($allPosibleVariants, $newVariant);
+                else {
+                    $productVariants = $this->generateOther($currentValues, $optionsWithValues, $newVariant, ($count + 1));
                     foreach ($productVariants as $productVariant)
                         array_push($allPosibleVariants, $productVariant);
                 }
