@@ -10,6 +10,7 @@ use Exception;
 use Hamcrest\Type\IsArray;
 use Illuminate\Http\Request;
 use TypeError;
+use Illuminate\Support\Str;
 
 class ProductVariationController extends Controller
 {
@@ -123,25 +124,40 @@ class ProductVariationController extends Controller
 
     public function updateProductVariants(Request $request, $pid)
     {
-        Product::findOrFail($pid);
-        foreach ($request->productVariants as $requestProductVariant) {
-            $productVariant = ProductVarient::find($requestProductVariant->id);
-            // update variant data
-            if ($productVariant !== null) {
-                $productVariant->update($requestProductVariant);
-
-                // update variant values
-                if ($requestProductVariant->productVarientValues !== null) {
-                    $productVariant->productVarientValues()->detach();
-                    foreach ($requestProductVariant->productVarientValues as $newVariantValues) {
-                        ProductVariantValues::create([
-                            'product_varient_id' => $productVariant->id,
-                            'product_id' => $pid,
-                            'option_values_id' => $newVariantValues->id
-                        ]);
+        $product = Product::findOrFail($pid);
+        if ($product->type = 'variant') {
+            $errors = [];
+            foreach ($request->all() as $requestProductVariant) {
+                $productVariant = ProductVarient::find($requestProductVariant['id']);
+                // update variant data
+                if ($productVariant !== null) {
+                    $productVariant->update($requestProductVariant);
+                    $requestProductVariant = (object) $requestProductVariant;
+                    // update variant values
+                    if ($requestProductVariant->product_varient_values !== null) {
+                        $productVariant->productVarientValues()->detach();
+                        foreach ($requestProductVariant->product_varient_values as $newVariantValue) {
+                            $newVariantValue = (object) $newVariantValue;
+                            if ($newVariantValue !== null && $newVariantValue->id !== "") {
+                                try {
+                                    ProductVariantValues::create([
+                                        'product_varient_id' => $productVariant->id,
+                                        'product_id' => $pid,
+                                        'option_values_id' => $newVariantValue->id
+                                    ]);
+                                } catch (\Exception $e) {
+                                    $error = 'Error occured at variant of id: ' . $productVariant->id . ". " . $e->getMessage();
+                                    array_push($errors, ['id' => Str::random(10), 'message' => $error]);
+                                }
+                            }
+                        }
                     }
                 }
             }
+        }
+
+        if (count($errors) > 0) {
+            return response()->json($errors, 422);
         }
     }
 
