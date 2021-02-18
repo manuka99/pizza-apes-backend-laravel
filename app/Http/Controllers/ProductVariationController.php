@@ -17,7 +17,7 @@ class ProductVariationController extends Controller
     public function getProductVariants($pid)
     {
         $product = Product::findOrFail($pid);
-        $productVariants = $product->productVarients;
+        $productVariants = $product->productVarients()->orderBy('order_by', 'asc')->get();
         foreach ($productVariants as $productVariant)
             $productVariant->productVarientValues;
         return $productVariants;
@@ -66,23 +66,12 @@ class ProductVariationController extends Controller
         return $pvid;
     }
 
-    public function createCustomVariation(Request $request, $pid)
+    public function createCustomVariation($pid)
     {
-        $product = Product::findOrFail($pid);
-        $productVariant = $product->productVarients()->create();
-        foreach ($request->option_value_ids as $option_value_id) {
-            ProductVariantValues::create([
-                'product_varient_id' => $productVariant->id,
-                'product_id' => $pid,
-                'option_values_id' => $option_value_id
-            ]);
-        }
-        $productVariant->refresh();
-        $productVariant->productVarientValues = $productVariant->productVarientValues;
-        return $productVariant;
+        return $this->createOtherVariationsPosible($pid, 1);
     }
 
-    public function createOtherVariationsPosible($pid)
+    public function createOtherVariationsPosible($pid, $limit = null)
     {
         $product = Product::findOrFail($pid);
         $productVariantValues = [];
@@ -99,6 +88,11 @@ class ProductVariationController extends Controller
             // get other variants
             $otherPosibleVariants =  $this->generateOther($productVariantValues, $optionsWithValues);
             $newProductVariantIds = [];
+
+            //if $limit is defined 
+            if ($limit !== null && count($otherPosibleVariants) > 0)
+                $otherPosibleVariants = array_slice($otherPosibleVariants, 0, $limit);
+
             // save to db
             foreach ($otherPosibleVariants as $otherPosibleVariant) {
                 $productVariant = $product->productVarients()->create();
@@ -127,18 +121,21 @@ class ProductVariationController extends Controller
         $product = Product::findOrFail($pid);
         if ($product->type = 'variant') {
             $errors = [];
-            foreach ($request->all() as $requestProductVariant) {
+            foreach ($request->all() as $key => $requestProductVariant) {
                 $productVariant = ProductVarient::find($requestProductVariant['id']);
                 // update variant data
                 if ($productVariant !== null) {
                     $productVariant->update($requestProductVariant);
+                    // organize
+                    $productVariant->order_by = $key;
+                    $productVariant->save();
                     $requestProductVariant = (object) $requestProductVariant;
                     // update variant values
                     if ($requestProductVariant->product_varient_values !== null) {
                         $productVariant->productVarientValues()->detach();
                         foreach ($requestProductVariant->product_varient_values as $newVariantValue) {
                             $newVariantValue = (object) $newVariantValue;
-                            if ($newVariantValue !== null && $newVariantValue->id !== "") {
+                            if ($newVariantValue !== null && $newVariantValue->id !== null) {
                                 try {
                                     ProductVariantValues::create([
                                         'product_varient_id' => $productVariant->id,

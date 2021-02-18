@@ -16,6 +16,7 @@ class CreateProductVarientsTable extends Migration
         Schema::create('product_varients', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('product_id')->unsigned();
+            $table->integer('order_by')->nullable()->default(0);
             $table->string('sku_id')->nullable();
             $table->string('image')->nullable();
             $table->double('regular_price')->nullable();
