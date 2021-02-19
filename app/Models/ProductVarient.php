@@ -11,6 +11,8 @@ class ProductVarient extends Model
     protected $fillable = [
         'sku_id',
         'image',
+        'order_by',
+        'enable',
         'regular_price',
         'schedule_offer',
         'offer_price',

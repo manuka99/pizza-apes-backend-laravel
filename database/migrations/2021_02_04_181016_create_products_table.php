@@ -17,6 +17,8 @@ class CreateProductsTable extends Migration
             $table->id();
             $table->string('url_name');
             $table->text('product_name')->nullable();
+            $table->double('minimun_price')->nullable();
+            $table->double('maximum_price')->nullable();
             $table->string('type')->default('simple');
             $table->string('status')->default('draft');
             $table->string('visibility')->default('public');
