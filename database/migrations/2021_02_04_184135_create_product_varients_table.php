@@ -17,6 +17,7 @@ class CreateProductVarientsTable extends Migration
             $table->id();
             $table->bigInteger('product_id')->unsigned();
             $table->integer('order_by')->nullable()->default(0);
+            $table->integer('enable')->default(true);
             $table->string('sku_id')->nullable();
             $table->string('image')->nullable();
             $table->double('regular_price')->nullable();
