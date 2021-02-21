@@ -127,8 +127,10 @@ class ProductVariationController extends Controller
                 if ($productVariant !== null) {
                     $productVariant->update($requestProductVariant);
                     // organize
-                    $productVariant->order_by = $key;
-                    $productVariant->save();
+                    if (count($request->all()) > 1) {
+                        $productVariant->order_by = $key;
+                        $productVariant->save();
+                    }
                     $requestProductVariant = (object) $requestProductVariant;
                     // update variant values
                     if ($requestProductVariant->product_varient_values !== null) {

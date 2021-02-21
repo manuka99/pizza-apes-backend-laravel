@@ -64,20 +64,29 @@ class ProductVariantExtrasController extends Controller
         ExtrasValues::destroy($evid);
     }
 
-    public function storeProductVariantExtra(Request $request, $pid)
+    public function storeVariantExtra(Request $request, $pvid)
     {
-        $product = Product::findOrFail($pid);
-        $productVariant = new ProductVarient();
-        if (($product->type === 'simple' || $product->type === 'bundle') && $product->productVarients()->count() < 2) {
-            if ($product->productVarients()->count() === 1)
-                $productVariant = $product->productVarients()->first();
-            // create new variant
-            else
-                $productVariant = $product->productVarients()->save($productVariant);
-        } else if ($product->type === 'variant' && $request->product_varient_id !== null)
-            $productVariant = ProductVarient::findOrFail($request->product_varient_id);
-        else
-            return response()->json(['message' => "Product type does not match with data."], 422);
+        $this->storeProductVariantExtra($request, $pvid, true);
+    }
+
+    public function storeProductVariantExtra(Request $request, $pid, $isVariant = false)
+    {
+        $productVariant = null;
+        if (!$isVariant) {
+            // assume pid is product id and fetch the first variant
+            $product = Product::findOrFail($pid);
+            $productVariant = $product->productVarients()->first();
+
+            if ($productVariant === null) {
+                // create new variant
+                $productVariant = new ProductVarient();
+                $product->productVarients()->save($productVariant);
+            }
+        } else {
+            // assume pid is product variant id
+            $productVariant = ProductVarient::findOrFail($pid);
+        }
+
         $productVariant->extras()->attach([
             $request->extras_id => [
                 'display_name' => $request->display_name,
@@ -103,10 +112,15 @@ class ProductVariantExtrasController extends Controller
         $productVariantExtra->update($request->all());
     }
 
-    public function getProductVariantExtra(Request $request, $pid)
+    public function getVariantExtra($pvid)
+    {
+        return $this->getProductVariantExtra($pvid, true);
+    }
+
+    public function getProductVariantExtra($pid, $isVariant = false)
     {
         $productVariant = null;
-        if ($request->type !== 'variant') {
+        if (!$isVariant) {
             // assume pid is product id and fetch the first variant
             $product = Product::findOrFail($pid);
             $productVariant = $product->productVarients()->first();
