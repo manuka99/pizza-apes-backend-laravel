@@ -19,19 +19,39 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        Category::create(
-            $request->all()
-        );
+        $request->validate([
+            'name' => ['required', 'max:85'],
+        ]);
+
+        $category = new Category();
+        $category->name = $request->name;
+        $category->root_id = $request->root_id;
+        $category->slug = $request->slug;
+        $category->image = $request->image;
+
+        if ($category->slug === '') {
+            $category->slug = $request->name;
+        }
+
+        $category->save();
     }
 
-    public function update(Request $request, $id)
+    public function setDefault($cid)
     {
-        $category = Category::findOrFail($id);
+        $category = Category::findOrFail($cid);
+        Category::where('is_default', true)->update(['is_default' => false]);
+        $category->is_default = true;
+        $category->save();
+    }
+
+    public function update(Request $request, $cid)
+    {
+        $category = Category::findOrFail($cid);
         $category->update($request->all());
     }
 
-    public function destroy($id)
+    public function destroy($cid)
     {
-        Category::destroy($id);
+        Category::destroy($cid);
     }
 }

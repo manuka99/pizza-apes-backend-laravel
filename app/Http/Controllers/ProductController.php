@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Gallery;
 use App\Models\Options;
 use App\Models\OptionValues;
@@ -29,20 +30,6 @@ class ProductController extends Controller
     public function destroy($id)
     {
         Product::destroy($id);
-    }
-
-    public function trashIn($id)
-    {
-        $product = Product::findOrFail($id);
-        $product->is_trashed = true;
-        $product->save();
-    }
-
-    public function trashOut($id)
-    {
-        $product = Product::findOrFail($id);
-        $product->is_trashed = false;
-        $product->save();
     }
 
     public function draft($id)
@@ -130,7 +117,7 @@ class ProductController extends Controller
         }
 
         $newProduct->save();
-        return $newProduct;
+        return $nextId;
     }
 
     public function create()
@@ -141,6 +128,9 @@ class ProductController extends Controller
         $product->id = $nextId;
         $product->url_name = $nextId;
         $product->save();
+        $category = Category::where('is_default', true)->first();
+        if ($category !== null)
+            $product->categories()->attach($category);
         return $nextId;
     }
 

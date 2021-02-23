@@ -9,11 +9,16 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'root_id'];
+    protected $fillable = ['name', 'image', 'slug', 'root_id'];
 
     public function products()
     {
         return $this->belongsToMany(Product::class, 'product_categories');
+    }
+
+    public function setSlugAttribute($slug)
+    {
+        $this->attributes['slug'] = str_replace(' ', '_', strtolower($slug));
     }
 
     public function children()

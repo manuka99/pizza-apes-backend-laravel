@@ -14,9 +14,11 @@ class CategorySeeder extends Seeder
      */
     public function run()
     {
-        Category::insert([
-            'id'=>1,
-            'name'=> ' Uncategorized'
+        Category::create([
+            'id' => 1,
+            'name' => ' Uncategorized',
+            'slug' => ' Uncategorized',
+            'is_default' => true
         ]);
     }
 }

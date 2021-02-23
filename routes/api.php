@@ -140,8 +140,6 @@ Route::middleware(['auth:sanctum'])->group(
         //product
         Route::post('/products', [ProductController::class, 'index']);
         Route::post('/products/destroy/{id}', [ProductController::class, 'destroy']);
-        Route::post('/products/trash-in/{id}', [ProductController::class, 'trashIn']);
-        Route::post('/products/trash-out/{id}', [ProductController::class, 'trashOut']);
 
         Route::post('/products/create', [ProductController::class, 'create']);
         Route::post('/products/draft/{id}', [ProductController::class, 'draft']);
@@ -153,8 +151,9 @@ Route::middleware(['auth:sanctum'])->group(
         //categories 
         Route::get('/categories', [CategoryController::class, 'index']);
         Route::post('/categories/new', [CategoryController::class, 'store']);
-        Route::post('/categories/update/{id}', [CategoryController::class, 'update']);
-        Route::delete('/categories/destroy/{id}', [CategoryController::class, 'destroy']);
+        Route::post('/categories/default/{cid}', [CategoryController::class, 'setDefault']);
+        Route::post('/categories/update/{cid}', [CategoryController::class, 'update']);
+        Route::delete('/categories/destroy/{cid}', [CategoryController::class, 'destroy']);
 
         // gallery
         Route::post('/gallery/{pid}', [GalleryController::class, 'storeProductGallery']);

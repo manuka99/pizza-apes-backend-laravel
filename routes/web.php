@@ -40,7 +40,7 @@ use Laravel\Fortify\Http\Controllers\VerifyEmailController;
 |
 */
 
-Route::get('/products/draft/{id}', [ProductController::class, 'draft']);
+Route::get('/categories/default/{cid}', [CategoryController::class, 'setDefault']);
 
 Route::get('/', function () {
     return view('welcome');
