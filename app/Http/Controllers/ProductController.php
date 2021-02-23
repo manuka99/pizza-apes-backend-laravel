@@ -27,9 +27,20 @@ class ProductController extends Controller
         return ['products' => $products, 'trashProducts' => $trash];
     }
 
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        Product::destroy($id);
+        foreach ($request->all() as $id)
+            Product::destroy($id);
+    }
+
+    public function trash(Request $request)
+    {
+        Product::whereIn('id', $request->all())->update(['is_trashed' => true]);
+    }
+
+    public function restore(Request $request)
+    {
+        Product::whereIn('id', $request->all())->update(['is_trashed' => false]);
     }
 
     public function draft($id)

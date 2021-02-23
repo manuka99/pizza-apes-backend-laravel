@@ -28,6 +28,7 @@ class CategoryController extends Controller
         $category->root_id = $request->root_id;
         $category->slug = $request->slug;
         $category->image = $request->image;
+        $category->description = $request->description;
 
         if ($category->slug === '') {
             $category->slug = $request->name;

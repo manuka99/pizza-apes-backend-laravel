@@ -138,8 +138,10 @@ Route::middleware(['auth:sanctum'])->group(
         Route::post('/files', [FileController::class, 'store']);
 
         //product
-        Route::post('/products', [ProductController::class, 'index']);
-        Route::post('/products/destroy/{id}', [ProductController::class, 'destroy']);
+        Route::get('/products', [ProductController::class, 'index']);
+        Route::post('/products/destroy', [ProductController::class, 'destroy']);
+        Route::post('/products/trash', [ProductController::class, 'trash']);
+        Route::post('/products/restore', [ProductController::class, 'restore']);
 
         Route::post('/products/create', [ProductController::class, 'create']);
         Route::post('/products/draft/{id}', [ProductController::class, 'draft']);

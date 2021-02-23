@@ -18,6 +18,7 @@ class CreateCategoriesTable extends Migration
             $table->string('name');
             $table->string('image')->nullable();
             $table->string('slug');
+            $table->text('description')->nullable();
             $table->bigInteger('root_id')->unsigned()->nullable();
             $table->boolean('is_default')->default(false);
             $table->unique(['slug']);

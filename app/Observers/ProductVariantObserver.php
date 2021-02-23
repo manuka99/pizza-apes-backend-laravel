@@ -15,7 +15,7 @@ class ProductVariantObserver
      */
     public function created(ProductVarient $productVarient)
     {
-        //
+        $this->onChangeVariantPrices($productVarient);
     }
 
     /**
@@ -26,38 +26,7 @@ class ProductVariantObserver
      */
     public function updated(ProductVarient $productVarient)
     {
-
-        $product = Product::find($productVarient->product_id);
-        if ($product !== null) {
-
-            $min_regular = ProductVarient::where('product_id', $productVarient->product_id)->whereNotNull('regular_price')->orderBy('regular_price')->first();
-
-            $max_regular = ProductVarient::where('product_id', $productVarient->product_id)->whereNotNull('regular_price')->orderByDesc('regular_price')->first();
-
-            $min_Offer = ProductVarient::where('product_id', $productVarient->product_id)->whereNotNull('offer_price')->orderBy('offer_price')->first();
-
-            $max_offer = ProductVarient::where('product_id', $productVarient->product_id)->whereNotNull('offer_price')->orderByDesc('offer_price')->first();
-
-
-            $min = 0;
-            $max = 0;
-
-            if ($min_regular !== null)
-                $min = $min_regular->regular_price;
-
-            if ($min_Offer !== null && $min > $min_Offer->offer_price)
-                $min = $min_Offer->offer_price;
-
-            if ($max_regular !== null)
-                $max = $max_regular->regular_price;
-
-            if ($max_offer !== null && $max < $max_offer->offer_price)
-                $max = $max_offer->offer_price;
-
-            $product->minimun_price = $min;
-            $product->maximum_price = $max;
-            $product->save();
-        }
+        $this->onChangeVariantPrices($productVarient);
     }
 
     /**
@@ -91,5 +60,40 @@ class ProductVariantObserver
     public function forceDeleted(ProductVarient $productVarient)
     {
         //
+    }
+
+    public function onChangeVariantPrices(ProductVarient $productVarient)
+    {
+        $product = Product::find($productVarient->product_id);
+        if ($product !== null) {
+
+            $min_regular = ProductVarient::where('product_id', $productVarient->product_id)->whereNotNull('regular_price')->orderBy('regular_price')->first();
+
+            $max_regular = ProductVarient::where('product_id', $productVarient->product_id)->whereNotNull('regular_price')->orderByDesc('regular_price')->first();
+
+            $min_Offer = ProductVarient::where('product_id', $productVarient->product_id)->whereNotNull('offer_price')->orderBy('offer_price')->first();
+
+            $max_offer = ProductVarient::where('product_id', $productVarient->product_id)->whereNotNull('offer_price')->orderByDesc('offer_price')->first();
+
+
+            $min = 0;
+            $max = 0;
+
+            if ($min_regular !== null)
+                $min = $min_regular->regular_price;
+
+            if ($min_Offer !== null && $min > $min_Offer->offer_price)
+                $min = $min_Offer->offer_price;
+
+            if ($max_regular !== null)
+                $max = $max_regular->regular_price;
+
+            if ($max_offer !== null && $max < $max_offer->offer_price)
+                $max = $max_offer->offer_price;
+
+            $product->minimun_price = $min;
+            $product->maximum_price = $max;
+            $product->save();
+        }
     }
 }
