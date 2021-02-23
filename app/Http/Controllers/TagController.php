@@ -2,23 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 
 class TagController extends Controller
 {
-    public function store(Request $request, $id)
+    public function store(Request $request, $pid)
     {
+        $product = Product::findOrFail($pid);
         $names = explode(",", $request->name);
         foreach ($names as $name) {
             if (strlen($name) > 0) {
-                Tag::create([
-                    'pid' => $id,
-                    'name' => trim($name)
-                ]);
+                $tag = new Tag();
+                $tag->name = trim($name);
+                $product->tags()->save($tag);
             }
         }
-        return Tag::where('pid', $id)->get();
+        return $product->tags;
     }
 
     public function destroy($id)
@@ -27,6 +28,6 @@ class TagController extends Controller
     }
     public function destroyAllProductTags($pid)
     {
-        Tag::where('pid', $pid)->delete();
+        Tag::where('product_id', $pid)->delete();
     }
 }

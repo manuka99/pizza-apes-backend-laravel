@@ -32,10 +32,14 @@ class ProductObserver
 
             if ($old_type === "bundle")
                 $product->options()->delete();
-            else if ($old_type === "variant") {
+
+            if ($old_type === "variant") {
                 $product->options()->delete();
                 $product->productVarients()->delete();
             }
+
+            if ($new_type === "variant")
+                $product->productVarients()->delete();
         }
     }
 

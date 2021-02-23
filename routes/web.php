@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthHandleController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\OptionsController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductVariationController;
 use App\Http\Controllers\SocialAuthController;
 use App\Models\Product;
@@ -39,15 +40,7 @@ use Laravel\Fortify\Http\Controllers\VerifyEmailController;
 |
 */
 
-Route::get('/product/variants/{pid}', [ProductVariationController::class, 'getProductVariants']);
-Route::post('/product/variants/allPosible/{pid}', [ProductVariationController::class, 'createAllPosibleVariations']);
-Route::get('/product/variants/otherPosible/{pid}', [ProductVariationController::class, 'createOtherVariationsPosible']);
-Route::post('/product/variants/custom/{pid}', [ProductVariationController::class, 'createCustomVariation']);
-Route::post('/product/variants/update/{pid}', [ProductVariationController::class, 'updateProductVariants']);
-Route::post('/product/variants/destroy-all/{pid}', [ProductVariationController::class, 'destroyAllVariants']);
-Route::delete('/product/variants/destroy/{pvid}', [ProductVariationController::class, 'destroyVariant']);
-Route::get('/options/{pid}', [OptionsController::class, 'getProductOptions']);
-
+Route::get('/products/draft/{id}', [ProductController::class, 'draft']);
 
 Route::get('/', function () {
     return view('welcome');

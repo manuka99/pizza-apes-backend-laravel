@@ -34,6 +34,16 @@ class Product extends Model
         return $this->belongsToMany(Category::class, 'product_categories');
     }
 
+    public function tags()
+    {
+        return $this->hasMany(Tag::class);
+    }
+
+    public function galleryImages()
+    {
+        return $this->hasMany(Gallery::class);
+    }
+
     public function options()
     {
         return $this->hasMany(Options::class);

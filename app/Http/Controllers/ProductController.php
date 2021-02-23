@@ -6,15 +6,133 @@ use App\Models\Gallery;
 use App\Models\Options;
 use App\Models\OptionValues;
 use App\Models\Product;
+use App\Models\ProductVariantExtras;
+use App\Models\ProductVariantValues;
 use App\Models\ProductVarient;
 use App\Models\SuggestedProducts;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PhpOption\Option;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ProductController extends Controller
 {
+
+    public function index()
+    {
+        $products = Product::where('is_trashed', false)->get();
+        $trash = Product::where('is_trashed', true)->get();
+        return ['products' => $products, 'trashProducts' => $trash];
+    }
+
+    public function destroy($id)
+    {
+        Product::destroy($id);
+    }
+
+    public function trashIn($id)
+    {
+        $product = Product::findOrFail($id);
+        $product->is_trashed = true;
+        $product->save();
+    }
+
+    public function trashOut($id)
+    {
+        $product = Product::findOrFail($id);
+        $product->is_trashed = false;
+        $product->save();
+    }
+
+    public function draft($id)
+    {
+        $statement = DB::select("SHOW TABLE STATUS LIKE 'products'");
+        $nextId = $statement[0]->Auto_increment;
+
+        $product = Product::findOrFail($id);
+        $newProduct = $product->replicate()->fill([
+            'product_name' =>  "Copy of " . $product->product_name,
+        ]);
+        $newProduct->id = $nextId;
+        $newProduct->url_name = $nextId;
+        $newProduct->save();
+        // tags
+        foreach ($product->tags as $tag) {
+            $newTag = $tag->replicate();
+            unset($newTag->id);
+            unset($newTag->product_id);
+            $newProduct->tags()->save($newTag);
+        }
+        // gallery
+        foreach ($product->galleryImages as $galleryImage) {
+            $newGalleryImage = $galleryImage->replicate();
+            unset($newGalleryImage->id);
+            unset($newGalleryImage->product_id);
+            $newProduct->galleryImages()->save($newGalleryImage);
+        }
+        //save categories
+        $newProduct->categories()->attach($product->categories()->pluck('category_id'));
+        //options
+        foreach ($product->options as $productOption) {
+            $newProductOption = $productOption->replicate();
+            unset($newProductOption->id);
+            unset($newProductOption->product_id);
+            $newProduct->options()->save($newProductOption);
+            $newProductOption->refresh();
+            foreach ($productOption->optionValues as $optionValue) {
+                $newOptionValue = $optionValue->replicate();
+                unset($newOptionValue->id);
+                unset($newOptionValue->option_id);
+                $newProductOption->optionValues()->save($newOptionValue);
+            }
+        }
+        //product variants
+        foreach ($product->productVarients as $productVariant) {
+            $newProductVariant = $productVariant->replicate();
+            unset($newProductVariant->id);
+            unset($newProductVariant->product_id);
+            $newProduct->productVarients()->save($newProductVariant);
+            $newProductVariant->refresh();
+            // for extras
+            foreach (ProductVariantExtras::where('product_varient_id', $productVariant->id)->get() as $extra) {
+                $newProductVariant->extras()->attach([
+                    $extra->extras_id => [
+                        'display_name' => $extra->display_name,
+                        'select_count' => $extra->select_count
+                    ]
+                ]);
+            }
+            // for variant values
+            foreach ($productVariant->productVarientValues as $productVarientValue) {
+                $chk_opt_values = OptionValues::where('value_name', $productVarientValue->value_name)->get();
+                $newOptionValue = null;
+                foreach ($chk_opt_values as $chk_opt_value) {
+                    if (Options::where('id', $chk_opt_value->option_id)->where('product_id', $newProduct->id)->first() !== null)
+                        $newOptionValue = $chk_opt_value;
+                }
+                if ($newOptionValue !== null) {
+                    ProductVariantValues::create([
+                        'product_varient_id' => $newProductVariant->id,
+                        'product_id' => $newProduct->id,
+                        'option_values_id' => $newOptionValue->id
+                    ]);
+                }
+            }
+        }
+
+        //suggested_products
+        foreach ($product->suggestedProducts as $suggestedProduct) {
+            $newSuggestedProduct = $suggestedProduct->replicate();
+            unset($newSuggestedProduct->id);
+            $newSuggestedProduct->pid_parent = $newProduct->id;
+            $newProduct->suggestedProducts()->save($newSuggestedProduct);
+        }
+
+        $newProduct->save();
+        return $newProduct;
+    }
+
     public function create()
     {
         $statement = DB::select("SHOW TABLE STATUS LIKE 'products'");
@@ -30,8 +148,7 @@ class ProductController extends Controller
     public function store(Request $request, $id)
     {
         $product = Product::findOrFail($id);
-        $newProduct = Product::updateOrCreate(
-            ['id' => $id],
+        $newProduct = $product->update(
             $request->except(['id']),
         );
 
@@ -49,8 +166,8 @@ class ProductController extends Controller
         $productData = Product::findOrFail($id);
         $productCategories = $productData->categories;
         $productCategoriesIds = $productCategories->pluck('id');
-        $productGalleryImages = Gallery::where('pid', $id)->where('type', 'product')->get();
-        $productTags = Tag::where('pid', $id)->get();
+        $productGalleryImages = $productData->galleryImages;
+        $productTags = $productData->tags;
         return [
             'productData' => $productData,
             'productCategories' => $productCategories,

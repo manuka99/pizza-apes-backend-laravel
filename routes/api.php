@@ -138,20 +138,29 @@ Route::middleware(['auth:sanctum'])->group(
         Route::post('/files', [FileController::class, 'store']);
 
         //product
+        Route::post('/products', [ProductController::class, 'index']);
+        Route::post('/products/destroy/{id}', [ProductController::class, 'destroy']);
+        Route::post('/products/trash-in/{id}', [ProductController::class, 'trashIn']);
+        Route::post('/products/trash-out/{id}', [ProductController::class, 'trashOut']);
+
         Route::post('/products/create', [ProductController::class, 'create']);
+        Route::post('/products/draft/{id}', [ProductController::class, 'draft']);
+
         Route::get('/products/{id}', [ProductController::class, 'product']);
         Route::post('/products/{id}', [ProductController::class, 'store']);
-
-        //categories
         Route::post('/products/add-category/{id}', [ProductController::class, 'storeCategories']);
+
+        //categories 
         Route::get('/categories', [CategoryController::class, 'index']);
         Route::post('/categories/new', [CategoryController::class, 'store']);
+        Route::post('/categories/update/{id}', [CategoryController::class, 'update']);
+        Route::delete('/categories/destroy/{id}', [CategoryController::class, 'destroy']);
 
         // gallery
-        Route::post('/gallery/{id}', [GalleryController::class, 'storeProduct']);
+        Route::post('/gallery/{pid}', [GalleryController::class, 'storeProductGallery']);
 
         // tags
-        Route::post('/tags/add/{id}', [TagController::class, 'store']);
+        Route::post('/tags/add/{pid}', [TagController::class, 'store']);
         Route::post('/tags/destroy/{id}', [TagController::class, 'destroy']);
         Route::post('/tags/destroy-all/{pid}', [TagController::class, 'destroyAllProductTags']);
 

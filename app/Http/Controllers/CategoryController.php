@@ -23,4 +23,15 @@ class CategoryController extends Controller
             $request->all()
         );
     }
+
+    public function update(Request $request, $id)
+    {
+        $category = Category::findOrFail($id);
+        $category->update($request->all());
+    }
+
+    public function destroy($id)
+    {
+        Category::destroy($id);
+    }
 }

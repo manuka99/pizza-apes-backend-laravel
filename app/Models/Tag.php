@@ -9,4 +9,9 @@ class Tag extends Model
 {
     use HasFactory;
     protected $fillable = ['name', 'pid'];
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }

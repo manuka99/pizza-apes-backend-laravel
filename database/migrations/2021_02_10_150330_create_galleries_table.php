@@ -16,10 +16,10 @@ class CreateGalleriesTable extends Migration
         Schema::create('galleries', function (Blueprint $table) {
             $table->id();
             $table->string('type');
-            $table->bigInteger('pid')->unsigned()->nullable();
+            $table->bigInteger('product_id')->unsigned()->nullable();
             $table->string('url');
             $table->string('name')->nullable();
-            $table->foreign('pid')->references('id')->on('products')->onDelete('cascade');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->timestamps();
         });
     }
