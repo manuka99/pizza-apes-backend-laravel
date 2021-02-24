@@ -214,6 +214,10 @@ Route::middleware(['auth:sanctum'])->group(
         Route::post('/product/variants/update/{pid}', [ProductVariationController::class, 'updateProductVariants']);
         Route::delete('/product/variants/destroy-all/{pid}', [ProductVariationController::class, 'destroyAllVariants']);
         Route::delete('/product/variants/destroy/{pvid}', [ProductVariationController::class, 'destroyVariant']);
+
+
+        // shipping
+
     }
 );
 
