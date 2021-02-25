@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class DeliveryClassOptions extends Model
 {
     use HasFactory;
+
+    public function classes()
+    {
+        return $this->belongsTo(DeliveryClass::class);
+    }
 }

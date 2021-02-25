@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateDeliveryClassOptionsTable extends Migration
+class CreateDeliveryAreaClasses extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,13 @@ class CreateDeliveryClassOptionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('delivery_class_options', function (Blueprint $table) {
+        Schema::create('area_classes', function (Blueprint $table) {
             $table->id();
-            $table->double('quantity');
-            $table->double('displacement');
             $table->bigInteger('delivery_class_id')->unsigned();
+            $table->bigInteger('delivery_area_id')->unsigned();
             $table->timestamps();
             $table->foreign('delivery_class_id')->references('id')->on('delivery_classes')->onDelete('cascade');
+            $table->foreign('delivery_area_id')->references('id')->on('delivery_areas')->onDelete('cascade');
         });
     }
 
@@ -30,6 +30,6 @@ class CreateDeliveryClassOptionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('delivery_class_options');
+        Schema::dropIfExists('area_classes');
     }
 }

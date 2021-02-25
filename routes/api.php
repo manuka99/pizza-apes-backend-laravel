@@ -136,48 +136,38 @@ Route::middleware(['auth:sanctum'])->group(function () {
 Route::middleware(['auth:sanctum'])->group(
     function () {
         Route::post('/files', [FileController::class, 'store']);
-
         //product
         Route::get('/products', [ProductController::class, 'index']);
         Route::post('/products/destroy', [ProductController::class, 'destroy']);
         Route::post('/products/trash', [ProductController::class, 'trash']);
         Route::post('/products/restore', [ProductController::class, 'restore']);
-
         Route::post('/products/create', [ProductController::class, 'create']);
         Route::post('/products/draft/{id}', [ProductController::class, 'draft']);
-
         Route::get('/products/{id}', [ProductController::class, 'product']);
         Route::post('/products/{id}', [ProductController::class, 'store']);
         Route::post('/products/add-category/{id}', [ProductController::class, 'storeCategories']);
-
         //categories 
         Route::get('/categories', [CategoryController::class, 'index']);
         Route::post('/categories/new', [CategoryController::class, 'store']);
         Route::post('/categories/default/{cid}', [CategoryController::class, 'setDefault']);
         Route::post('/categories/update/{cid}', [CategoryController::class, 'update']);
         Route::delete('/categories/destroy/{cid}', [CategoryController::class, 'destroy']);
-
         // gallery
         Route::post('/gallery/{pid}', [GalleryController::class, 'storeProductGallery']);
-
         // tags
         Route::post('/tags/add/{pid}', [TagController::class, 'store']);
         Route::post('/tags/destroy/{id}', [TagController::class, 'destroy']);
         Route::post('/tags/destroy-all/{pid}', [TagController::class, 'destroyAllProductTags']);
-
         // product data
         Route::get('/products/simple_bundle/{id}', [ProductController::class, 'getSimpleAndBundleData']);
         Route::post('/products/simple_bundle/{id}', [ProductController::class, 'storeSimpleAndBundleData']);
-
         //suggestions
         Route::get('/products/suggested/{id}', [ProductController::class, 'getSuggestedProducts']);
         Route::post('/products/suggested/{id}', [ProductController::class, 'storeSuggestedProducts']);
         Route::post('/products/suggested/destroy/{id}', [ProductController::class, 'destroySuggestedProducts']);
         Route::post('/products/suggested/destroy-all/{id}', [ProductController::class, 'destroyAllSuggestedProducts']);
-
         //search
         Route::post('/search_products', [ProductController::class, 'searchProducts']);
-
         //options
         Route::post('/options/option/{pid}', [OptionsController::class, 'storeOption']);
         Route::post('/options/option/update/{oid}', [OptionsController::class, 'updateOption']);
@@ -187,7 +177,6 @@ Route::middleware(['auth:sanctum'])->group(
         Route::delete('/options/option_value/destroy/{ovid}', [OptionsController::class, 'deleteOptionValue']);
         Route::delete('/options/option_value/destroy-all/{oid}', [OptionsController::class, 'deleteAllOptionValues']);
         Route::get('/options/{pid}', [OptionsController::class, 'getProductOptions']);
-
         //extras
         Route::get('/extras/index', [ProductVariantExtrasController::class, 'index']);
         Route::get('/extras/get/{eid}', [ProductVariantExtrasController::class, 'get']);
@@ -205,7 +194,6 @@ Route::middleware(['auth:sanctum'])->group(
         Route::post('/extras/variant/store/{pvid}', [ProductVariantExtrasController::class, 'storeVariantExtra']);
         Route::post('/extras/variant/update/{pveid}', [ProductVariantExtrasController::class, 'updateProductVariantExtra']);
         Route::delete('/extras/variant/destroy/{pveid}', [ProductVariantExtrasController::class, 'destroyProductVariantExtra']);
-
         // variable product
         Route::get('/product/variants/{pid}', [ProductVariationController::class, 'getProductVariants']);
         Route::post('/product/variants/allPosible/{pid}', [ProductVariationController::class, 'createAllPosibleVariations']);
@@ -214,7 +202,6 @@ Route::middleware(['auth:sanctum'])->group(
         Route::post('/product/variants/update/{pid}', [ProductVariationController::class, 'updateProductVariants']);
         Route::delete('/product/variants/destroy-all/{pid}', [ProductVariationController::class, 'destroyAllVariants']);
         Route::delete('/product/variants/destroy/{pvid}', [ProductVariationController::class, 'destroyVariant']);
-
 
         // shipping
 
